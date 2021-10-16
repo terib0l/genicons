@@ -1,0 +1,21 @@
+version: latest
+
+services:
+  # Frontend
+  vue:
+    build: ./frontend
+    restart: always
+    ports:
+    volums:
+    networks: api-net
+
+  # Backend
+  fastapi:
+    build: ./backend
+    restart: always
+    ports:
+    volums:
+    networks: api-net
+
+networks:
+  api-net
