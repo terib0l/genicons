@@ -10,19 +10,15 @@ router = APIRouter(
         tags=["db", "auths"]
         )
 
-@router.post("/create/")
 def create():
     pass
 
-@router.get("/read/")
 def read():
     pass
 
-@router.put("/update/")
 def update():
     pass
 
-@router.delete("/delete/")
 def delete():
     pass
 

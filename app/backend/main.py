@@ -1,13 +1,22 @@
+# Ref[progress bar]: https://stackoverflow.com/questions/64901945/how-to-send-a-progress-of-operation-in-a-fastapi-app
+
 from fastapi import FastAPI, Request, BackgroundTasks, File, UploadFile
 from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
-from module import *
-from db import works, auths
-from ml import model
+
+import asyncio
+from uuid import UUID, uuid4
+from typing import Dict
+from pydantic import BaseModel, Field
+
+from module import ml
 
 app = FastAPI()
 
+# Ref: https://fastapi.tiangolo.com/tutorial/bigger-applications/
 app.include_router(works.router)
+
+# Ref: https://fastapi.tiangolo.com/tutorial/cors/
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],
@@ -16,33 +25,58 @@ app.add_middleware(
     allow_headers=['*']
 )
 
-@app.get("/")
-def index():
-    pass
+class JobStatus(BaseModel):
+    uid: UUID = Field(default_factory=uuid4)
+    status: str = "in_progress"
+    progress: int = 0
+    result: str = ""
 
-@app.post("/generate/")
+jobs: Dict[UUID, JobStatus] = {}
+
+async def start_task(uid: UUID) -> None:
+    queue = asyncio.Queue()
+    asyncio.create_task(ml.long_task(queue))
+
+    while progress := await queue.get():
+        jobs[uid].progress = progress
+
+    jobs[uid].status = "complete"
+
+@app.get("/", response_class=RedirectResponse)
+def index(request: Request):
+    url = request.url_for("index")
+    url += "docs"
+    return RedirectResponse(url)
+
+'''
 def generate(background: BackgroundTasks, img: UploadFile = File(...)):
     # check img size
+    if img:
+        print(img.__dict__)
+'''
+@app.post("/icon/generate/")
+def generate(background: BackgroundTasks):
+    task = JobStatus()
+    jobs[task.uid] = task
+    # Ref: https://fastapi.tiangolo.com/tutorial/background-tasks/
+    background.add_task(start_task, task.uid)
 
-    background.add_task(model.style_transfer, img)
-    return {"message": "Generating now!"}
-
-@app.get("/status/")
-def generate_status(request: Request):
-    # confirm status -> return progress variable
-
-    if progress < 100:
-        return {
-            "message": "In progress",
-            "progress": progress
-        }
-    else:
-        url = request.url_for("icon_download")
-        return RedirectResponse(url=url, status_code=200)
-
-@app.get("/download/", response_class=FileResponse)
-def icon_download():
     return {
-            "rounded square": FileResponse("./icons/****_rs.jpg"),
-            "circle": FileResponse("./icons/****_c.jpg")
+            "message": "Start generating now!",
+            "task_handle": task
+    }
+
+@app.get("/status/{uid}")
+def task_status(uid: UUID, request: Request):
+    if jobs[uid].status == "complete":
+        url = request.url_for("icon_download") + "?uid={}".format(uid)
+        jobs[uid].result = url
+
+    return jobs[uid]
+
+@app.get("/icon/download/", response_class=FileResponse)
+def icon_download(uid: UUID):
+    return {
+            "rounded square": FileResponse("./icons/{}_rs.jpg".format(uid)),
+            "circle": FileResponse("./icons/{}_c.jpg".format(uid))
     }
