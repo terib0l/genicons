@@ -1,0 +1,7 @@
+CREATE TABLE samples (
+    id INT NOT NULL AUTO_INCREMENT,
+    uuid VARCHAR(32) UNIQUE NOT NULL,
+    title VARCHAR(20) NOT NULL,
+    icon VARCHAR(30) NOT NULL,
+    PRIMARY KEY (id)
+)

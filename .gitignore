@@ -1,2 +1,4 @@
 venv/
 __pycache__/
+app/backend/api/test.py
+app/backend/api/icon/

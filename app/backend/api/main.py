@@ -4,17 +4,18 @@ from fastapi import FastAPI, Request, BackgroundTasks, File, UploadFile
 from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-import asyncio
-from uuid import UUID, uuid4
+import asyncio, aiofiles
+from uuid import UUID
 from typing import Dict
-from pydantic import BaseModel, Field
 
-from module import ml
+from module.ml import *
+from module.schema import *
+import db
 
 app = FastAPI()
 
 # Ref: https://fastapi.tiangolo.com/tutorial/bigger-applications/
-app.include_router(works.router)
+app.include_router(db.router)
 
 # Ref: https://fastapi.tiangolo.com/tutorial/cors/
 app.add_middleware(
@@ -25,40 +26,41 @@ app.add_middleware(
     allow_headers=['*']
 )
 
-class JobStatus(BaseModel):
-    uid: UUID = Field(default_factory=uuid4)
-    status: str = "in_progress"
-    progress: int = 0
-    result: str = ""
+app.add_middleware(
+    ValidateUploadFileMiddleware,
+    app_path = "/icon/generate/",
+    max_size = 120000,
+    file_type = ["image/jpeg"]
+)
 
-jobs: Dict[UUID, JobStatus] = {}
+jobs: Dict[UUID, GenerateStatus] = {}
+
+@app.get("/", response_class=RedirectResponse)
+def index(request: Request):
+    return RedirectResponse(request.url_for("index") + "docs")
 
 async def start_task(uid: UUID) -> None:
     queue = asyncio.Queue()
-    asyncio.create_task(ml.long_task(queue))
+    asyncio.create_task(long_task(queue))
 
     while progress := await queue.get():
         jobs[uid].progress = progress
 
     jobs[uid].status = "complete"
 
-@app.get("/", response_class=RedirectResponse)
-def index(request: Request):
-    url = request.url_for("index")
-    url += "docs"
-    return RedirectResponse(url)
-
-'''
-def generate(background: BackgroundTasks, img: UploadFile = File(...)):
-    # check img size
-    if img:
-        print(img.__dict__)
-'''
+# Ref: https://fastapi.tiangolo.com/tutorial/request-files/
+# Ref: https://fastapi.tiangolo.com/tutorial/background-tasks/
+# Ref: https://stackoverflow.com/questions/63580229/how-to-save-uploadfile-in-fastapi
 @app.post("/icon/generate/")
-def generate(background: BackgroundTasks):
-    task = JobStatus()
+async def generate(background: BackgroundTasks, file: UploadFile = File(...)):
+    file_path = "./icon/" + file.filename
+    async with aiofiles.open(file_path, 'wb') as save_file:
+        content = await file.read()
+        await save_file.write(content)
+        await save_file.close()
+
+    task = GenerateStatus()
     jobs[task.uid] = task
-    # Ref: https://fastapi.tiangolo.com/tutorial/background-tasks/
     background.add_task(start_task, task.uid)
 
     return {
@@ -67,15 +69,15 @@ def generate(background: BackgroundTasks):
     }
 
 @app.get("/status/{uid}")
-def task_status(uid: UUID, request: Request):
+async def status(uid: UUID, request: Request):
     if jobs[uid].status == "complete":
-        url = request.url_for("icon_download") + "?uid={}".format(uid)
+        url = request.url_for("download") + "?uid={}".format(uid)
         jobs[uid].result = url
 
     return jobs[uid]
 
 @app.get("/icon/download/", response_class=FileResponse)
-def icon_download(uid: UUID):
+async def download(uid: UUID):
     return {
             "rounded square": FileResponse("./icons/{}_rs.jpg".format(uid)),
             "circle": FileResponse("./icons/{}_c.jpg".format(uid))

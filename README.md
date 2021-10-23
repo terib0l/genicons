@@ -6,7 +6,7 @@
 ## Description
 
 The aim of developing this application is to learn about these technologies.  
-[SQL, ML, AWS, DevSecOps, Docker + IaC]  
+***[SQL, ML, AWS, DevSecOps, Docker + IaC]***  
 I'll Create Web API using FastAPI with SQL and ML and dockerize it.  
 For the front end, I'll use Vue.js as it is easy to develop SPA.  
 Then deploy this app on AWS.  
@@ -35,7 +35,26 @@ $
 
 [MIT](https://github.com/terib0l/genicons/blob/main/LICENSE)
 
-## Technical-Elements
+## Memo
+
+#### To-Do
+
+* ~~バックエンドのベースを書いておく~~
+* ~~処理のプログレスを実装（画像生成に時間がかかる場合を想定）~~
+* SQLの実装
+* フロントエンドのベースを実装（FastAPIとの連携を含む）
+* フロントエンドの細かい部分を実装
+* アプリをDocker化(Dockerfileとdocker-composeを記述)
+* AWSに移行
+* ローカルでMLモデルのサンプルを実装
+* AWSのMLサービスを検討しつつ、MLモデルを実装
+* AWS上でのアプリの動作検証
+* DevSecOpsのワークフローについて考える
+  * Githubからの自動デプロイの方法
+  * IaCについて考える
+  * etc
+
+#### Technical-Elements
 
 * FastAPI
   * Docker
