@@ -2,10 +2,6 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 import random
 
-from sql.database import *
-from sql.models import *
-from sql.crud import *
-
 Base.metadata.create_all(bind=ENGINE)
 
 router = APIRouter()

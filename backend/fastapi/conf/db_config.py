@@ -7,7 +7,7 @@ DB_NAME = "sample_db"
 USER = "user"
 PASSWORD = "password"
 
-SQLALCHEMY_DATABASE_URL = "mysql://{}:{}@{}/{}?charset=utf8".format(USER, PASSWORD, HOST, DB_NAME)
+SQLALCHEMY_DATABASE_URL = f"mysql://{USER}:{PASSWORD}@{HOST}/{DB_NAME}?charset=utf8"
 
 ENGINE = create_engine(
         SQLALCHEMY_DATABASE_URL,

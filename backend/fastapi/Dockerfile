@@ -5,4 +5,4 @@ WORKDIR /usr/src/api
 RUN pip install -r requirements.txt
 
 # コンテナ起動後、FastAPIアプリの起動
-CMD ["uvicorn", "main:app", "--reload", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["gunicorn", "-c", "./conf/gunicorn.py"]

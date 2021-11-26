@@ -26,13 +26,13 @@ services:
     links:                # dbコンテナを起動後に立ち上げる
       - db
     container_name: "api"
-    build: ./api
+    build: ./fastapi
     restart: always
     tty: true
     ports:
       - "8080:8080"
     volumes:
-      - ./api:/usr/src/api
+      - ./fastapi:/usr/src/api
     networks:
       - genicons-api-net
 

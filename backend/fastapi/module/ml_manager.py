@@ -1,6 +1,6 @@
 import asyncio
 
-async def long_task(queue: asyncio.Queue):
+async def StyleTransfer(queue: asyncio.Queue):
     for i in range(0, 10):
         await asyncio.sleep(1)
         await queue.put(i+1)
