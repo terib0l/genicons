@@ -5,4 +5,4 @@ class GenerateStatus(BaseModel):
     uid: UUID = Field(default_factory=uuid4)
     status: str = "in_progress"
     progress: int = 0
-    result: str = ""
+    result: list = []

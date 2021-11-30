@@ -3,17 +3,18 @@ BASE_DIR = os.getcwd()
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette_validation_uploadfile import ValidateUploadFileMiddleware
 
 from router import ui, db
-from module.middleware import ValidateUploadFileMiddleware
+from conf.db_config import Base, ENGINE
+
+Base.metadata.create_all(bind=ENGINE, checkfirst=False)
 
 app = FastAPI()
 
-# Ref: https://fastapi.tiangolo.com/tutorial/bigger-applications/
 app.include_router(ui.router)
 app.include_router(db.router)
 
-# Ref: https://fastapi.tiangolo.com/tutorial/cors/
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],
@@ -24,8 +25,11 @@ app.add_middleware(
 
 app.add_middleware(
     ValidateUploadFileMiddleware,
-    app_path = "/icon/generate/",
-    max_size = 120000,
+    app_path = [
+        "/icon/generate/",
+        "/pic/save",
+    ],
+    max_size = 16777216, # MySQL MEDIUMBLOB SIZE
     file_type = ["image/jpeg"]
 )
 

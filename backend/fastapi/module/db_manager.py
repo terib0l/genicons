@@ -1,40 +1,29 @@
 from sqlalchemy.orm import Session
 from uuid import UUID
 
-from conf.db_models import SampleTable
+from conf.db_models import InitializeTable, ProductedTable
 
-def create(db: Session, uuid: UUID, title: str, icon_url: str):
-    db_sample = SampleTable(uuid=uuid, title=title, icon=icon_url)
-    db.add(db_sample)
+def create(db: Session, uuid: UUID, img: binary, img_name: str):
+    Initialization = InitializeTable(user_id=uuid, img=img, img_name=img_name)
+    db.add(Initialization)
     db.commit()
-    db.refresh(db_sample)
-    return db_sample
+    db.refresh(Initialization)
+    return Initialization
 
-def read_by_uuid(db: Session, uuid: UUID):
-    return db.query(SampleTable).filter(SampleTable.uuid == uuid).first()
-
-def read_by_id(db: Session, id: int):
-    return db.query(SampleTable).filter(SampleTable.id == id).first()
-
-def update_by_icon(db: Session, uuid: UUID, icon_url: str):
-    obj = db.query(SampleTable).filter_by(uuid = uuid).one()
-    obj.icon = icon_url
-    db.add(obj)
-    res = db.commit()
-    return res
-
-def update_by_title(db: Session, uuid: UUID, title: str):
-    obj = db.query(SampleTable).filter_by(SampleTable.uuid == uuid).one()
-    obj.title = title
-    db.add(obj)
-    res = db.commit()
-    return res
+def read(db: Session, uuid: UUID):
+    return db.query(InitializeTable).filter(InitializeTable.uuid == uuid).first()
 
 def delete(db: Session, uuid: UUID):
-    obj = db.query(SampleTable).filter_by(SampleTable.uuid == uuid).one()
+    obj = db.query(InitializeTable).filter_by(InitializeTable.uuid == uuid).one()
     db.delete(obj)
     db.commit()
     return obj
 
 def count(db: Session):
-    return db.query(SampleTable).count()
+    return db.query(InitializeTable).count()
+
+def read_rounded_square_pic(db: Session, uuid: UUID):
+    pass
+
+def read_circle_pic(db: Session, uuid: UUID):
+    pass
