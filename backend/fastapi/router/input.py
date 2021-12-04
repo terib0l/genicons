@@ -1,13 +1,13 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Request, BackgroundTasks, File, UploadFile
+from fastapi import APIRouter, Request, BackgroundTasks, UploadFile
 from fastapi.param_functions import Depends
 from sqlalchemy.orm import Session
 
-from module.schema import GenerateStatus
-from module.dependency import get_db, ValidateUploadFile, FileTypeName
-from module.utilities import jobs, start_task
-from module.db_manager import create
+from module.schema import GenerateStatus, jobs
+from module.dependency import ValidateUploadFile, FileTypeName
+from db.session import get_db
+from crud.crud_user import create
 
 router = APIRouter()
 
@@ -36,7 +36,7 @@ async def save_img(
     handle = GenerateStatus()
     uuid = handle.uid
 
-    res = create(session, uuid, img, img.filename)
+    res = create(session, uuid, img.filename, img)
 
     return res
 
@@ -58,9 +58,9 @@ async def generate_icon_from_img(
     handle = GenerateStatus()
     jobs[handle.uid] = handle
 
-    create(session, handle.uid, img, img.filename)
+    create(session, handle.uid, img.filename, img)
 
-    background.add_task(start_task, handle.uid)
+    #background.add_task(start_task, handle.uid)
 
     return handle
 

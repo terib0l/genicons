@@ -1,17 +1,14 @@
-import os
-BASE_DIR = os.getcwd()
-
 from fastapi import FastAPI
 
 from router import input, output
-from conf.db_config import Base, ENGINE
-
-Base.metadata.create_all(bind=ENGINE, checkfirst=False)
 
 app = FastAPI()
-
 app.include_router(input.router)
 app.include_router(output.router)
+
+from db.db_init import Base, ENGINE
+
+Base.metadata.create_all(bind=ENGINE, checkfirst=False)
 
 ############
 # For test #

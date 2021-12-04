@@ -2,6 +2,13 @@ FROM python:3.8
 
 WORKDIR /usr/src/api
 
+COPY * .
+
+RUN apt-get update && apt-get install -y \
+    python3-dev \
+    default-libmysqlclient-dev \
+    build-essential
+
 RUN pip install -r requirements.txt
 
 # コンテナ起動後、FastAPIアプリの起動
