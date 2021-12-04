@@ -3,7 +3,7 @@ from uuid import UUID
 
 from conf.db_models import InitializeTable, ProductedTable
 
-def create(db: Session, uuid: UUID, img: binary, img_name: str):
+def create(db: Session, uuid: UUID, img, img_name: str):
     Initialization = InitializeTable(user_id=uuid, img=img, img_name=img_name)
     db.add(Initialization)
     db.commit()

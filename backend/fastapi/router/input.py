@@ -1,19 +1,29 @@
-import aiofiles
 from uuid import UUID
 
 from fastapi import APIRouter, Request, BackgroundTasks, File, UploadFile
 from fastapi.param_functions import Depends
 from sqlalchemy.orm import Session
 
-from main import BASE_DIR
 from module.schema import GenerateStatus
-from module.utilities import get_db, jobs, start_task
+from module.dependency import get_db, ValidateUploadFile, FileTypeName
+from module.utilities import jobs, start_task
 from module.db_manager import create
 
 router = APIRouter()
 
+validate_upload_file = ValidateUploadFile(
+        max_size=12000,
+        file_type=[
+            FileTypeName.jpg,
+            FileTypeName.png
+        ],
+)
+
 @router.post("/img/save")
-async def save_img(file: UploadFile = File(...), session: Session = Depends(get_db)):
+async def save_img(
+        img: UploadFile = Depends(validate_upload_file),
+        session: Session = Depends(get_db)
+    ):
     """Return path of recieved img
 
     * args
@@ -26,12 +36,16 @@ async def save_img(file: UploadFile = File(...), session: Session = Depends(get_
     handle = GenerateStatus()
     uuid = handle.uid
 
-    res = create(session, uuid, file, file.filename)
+    res = create(session, uuid, img, img.filename)
 
     return res
 
 @router.post("/icon/generate")
-async def generate_icon_from_img(background: BackgroundTasks, file: UploadFile = File(...), session: Session = Depends(get_db)) -> GenerateStatus:
+async def generate_icon_from_img(
+        background: BackgroundTasks,
+        img: UploadFile = Depends(validate_upload_file),
+        session: Session = Depends(get_db)
+    ) -> GenerateStatus:
     """Start Generating icons
     
     * args
@@ -44,14 +58,17 @@ async def generate_icon_from_img(background: BackgroundTasks, file: UploadFile =
     handle = GenerateStatus()
     jobs[handle.uid] = handle
 
-    create(session, handle.uid, file, file.filename)
+    create(session, handle.uid, img, img.filename)
 
     background.add_task(start_task, handle.uid)
 
     return handle
 
 @router.get("/icon/generate/status/{uid}")
-async def status_of_generating(request: Request, uid: UUID) -> GenerateStatus:
+async def status_of_generating(
+        request: Request,
+        uid: UUID
+    ) -> GenerateStatus:
     """Return Handle for progress of generating icons
 
     * args
