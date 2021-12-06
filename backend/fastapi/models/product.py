@@ -1,15 +1,13 @@
-from sqlalchemy import Column, LargeBinary
-from sqlalchemy_utils import UUIDType
-from uuid import uuid4
+from sqlalchemy import Column, LargeBinary, Integer
+from sqlalchemy.orm import relationship
 
 from db.db_init import Base
 
-class ProductTable(Base):
-    """
-    Producted images by app
-    """
-    __tablename__ = 'product'
+class Product(Base):
+    __tablename__ = 'products'
 
-    id = Column(UUIDType(binary=False), default=uuid4, primary_key=True)
+    id = Column(Integer, primary_key=True, index=True)
     rounded_square_icon = Column(LargeBinary(length=(2**24)))
     circle_icon = Column(LargeBinary(length=(2**24)))
+
+    owner = relationship("User", back_populates="products")
