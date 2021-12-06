@@ -12,4 +12,4 @@ class User(Base):
     img = Column(LargeBinary(length=(2**24)), nullable=False) # size = MEDIUMBLOB
     img_name = Column(String(20), nullable=False)
 
-    products = relationship("Product", back_populates="owner")
+    products = relationship("Product")

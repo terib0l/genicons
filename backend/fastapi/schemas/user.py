@@ -1,6 +1,5 @@
 from typing import List
 from pydantic import BaseModel, Field
-#from pydantic import StrictBytes
 from pydantic.types import UUID4
 
 from product import Product
