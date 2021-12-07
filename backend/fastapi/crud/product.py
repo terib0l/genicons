@@ -1,6 +1,9 @@
+import os
+
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.expression import func
 from pydantic import UUID4, Field
+from zipfile import ZipFile
 
 import models, schemas
 
@@ -18,7 +21,8 @@ def create(db: Session, product: schemas.Product) -> bool:
 
 def all_read(db: Session):
     try:
-        return db.query(models.Product).all()
+        raise Exception("No implementation")
+        #return db.query(models.Product).all()
     except:
         return False
 
@@ -28,12 +32,19 @@ def read_by_id(db: Session, id: int):
     except:
         return False
 
-def read_by_uuid(db: Session, uuid: UUID4):
+def read_by_uuid(db: Session, uuid: UUID4) -> ZipFile:
     try:
         user = db.query(models.User).filter(models.User.uuid == uuid).first()
-        return user.products
+
+        with ZipFile('tmp.zip', 'w') as zipObj:
+            zipObj.write(user.products.rounded_square_icon)
+            zipObj.write(user.products.circle_icon)
+
+        return zipObj
     except:
-        return False
+        raise Exception('read_by_uuid is error')
+    finally:
+        os.remove('./tmp.zip')
 
 def random_read(db: Session, num: int = Field(..., max_num=20, min_num=10)):
     try:

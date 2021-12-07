@@ -1,11 +1,12 @@
 from pydantic import BaseModel, Field
-from uuid import UUID, uuid4
+from uuid import uuid4
 from typing import Dict
+from pydantic import UUID4, HttpUrl
 
 class GenerateStatus(BaseModel):
-    uid: UUID = Field(default_factory=uuid4)
+    uid: UUID4 = Field(default_factory=uuid4)
     status: str = "in_progress"
     progress: int = 0
-    result: list = []
+    url: HttpUrl = Field(None)
 
-jobs: Dict[UUID, GenerateStatus] = {}
+jobs: Dict[UUID4, GenerateStatus] = {}

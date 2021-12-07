@@ -16,9 +16,11 @@ accesslog = "/var/log/gunicorn/access.log"
 errorlog = "/var/log/gunicorn/error.log"
 
 reload = True
-#daemon = True
+daemon = True
 
 raw_env = []
 with open(".env", "r") as envs:
     while env := envs.readline():
         raw_env.append(re.sub("\n", "", env))
+
+print("Complete load config")

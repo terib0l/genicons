@@ -1,34 +1,25 @@
-from uuid import UUID
-from typing import List
-
 from fastapi import APIRouter, Depends, Query
-from fastapi.responses import FileResponse
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
-from typing import Optional
+from pydantic import UUID4
 
-from crud.crud_product import read_rounded_square_pic, read_circle_pic, random_read, count
+from crud.product import read_by_uuid, random_read
 from db.session import get_db
 
 router = APIRouter()
 
 @router.get("/gallery")
 def gallery(
-        num: Optional[int] = Query(10, ge=10.0, le=20.0),
-        session: Session = Depends(get_db)
+        session: Session = Depends(get_db),
+        num: int = Query(10, ge=10.0, le=20.0)
     ):
-    imgs = List()
-    availble_num = count(session)
+    gallery_items = random_read(session, num)
 
-    if availble_num < num:
-        imgs.extend(random_read(session, availble_num))
-    else:
-        imgs.extend(random_read(session, num))
+    return gallery_items
 
-    return imgs
-
-@router.get("/icon/download/{uid}_rs", response_class=FileResponse)
-async def download_rounded_square_icon(
-        uid: UUID,
+@router.get("/icon/download/{uid}", response_class=StreamingResponse)
+async def download_products(
+        uid: UUID4,
         session: Session = Depends(get_db)
     ):
     """Return generated rounded squere pic like icon
@@ -37,27 +28,10 @@ async def download_rounded_square_icon(
     uid: UUID
 
     * return
-    rs: jpeg (Rounded-Square pic)
+    product: zip-file (contained two icons)
     """
+    product = read_by_uuid(session, uid)
 
-    rounded_square_pic = read_rounded_square_pic(session, uid)
-
-    return FileResponse(rounded_square_pic)
-
-@router.get("/icon/download/{uid}_c", response_class=FileResponse)
-async def download_circle_icon(
-        uid: UUID,
-        session: Session = Depends(get_db)
-    ):
-    """Return generated circle pic like icon
-
-    * args
-    uid: UUID
-
-    * return
-    c: jpeg (Circle pic)
-    """
-
-    circle_pic = read_circle_pic(session, uid)
-
-    return FileResponse(circle_pic)
+    if product:
+        return StreamingResponse(product)
+    raise Exception("product is None")

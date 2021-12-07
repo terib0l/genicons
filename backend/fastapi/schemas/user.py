@@ -2,7 +2,7 @@ from typing import List
 from pydantic import BaseModel, Field
 from pydantic.types import UUID4
 
-from product import Product
+from .product import Product
 
 class User(BaseModel):
     id: UUID4

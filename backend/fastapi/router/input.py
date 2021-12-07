@@ -1,13 +1,12 @@
-from uuid import UUID
-
-from fastapi import APIRouter, Request, BackgroundTasks, UploadFile
-from fastapi.param_functions import Depends
+from fastapi import APIRouter, Request, BackgroundTasks, UploadFile, Depends
 from sqlalchemy.orm import Session
+from pydantic import UUID4
 
 from module.schema import GenerateStatus, jobs
 from module.dependency import ValidateUploadFile, FileTypeName
 from db.session import get_db
-from crud.crud_user import create
+from schemas.user import User
+from crud.user import create
 
 router = APIRouter()
 
@@ -30,15 +29,14 @@ async def save_img(
     file: img
 
     * return
-    ?
+    handle: dict (UUID contained)
     """
 
     handle = GenerateStatus()
-    uuid = handle.uid
 
-    res = create(session, uuid, img.filename, img)
+    create(session, User(id=handle.uid, img=img, img_name=img.filename))
 
-    return res
+    return handle
 
 @router.post("/icon/generate")
 async def generate_icon_from_img(
@@ -58,7 +56,7 @@ async def generate_icon_from_img(
     handle = GenerateStatus()
     jobs[handle.uid] = handle
 
-    create(session, handle.uid, img.filename, img)
+    create(session, User(id=handle.uid, img=img, img_name=img.filename))
 
     #background.add_task(start_task, handle.uid)
 
@@ -67,7 +65,7 @@ async def generate_icon_from_img(
 @router.get("/icon/generate/status/{uid}")
 async def status_of_generating(
         request: Request,
-        uid: UUID
+        uid: UUID4
     ) -> GenerateStatus:
     """Return Handle for progress of generating icons
 
@@ -78,8 +76,7 @@ async def status_of_generating(
     handle: dict (UUID contained)
     """
     if jobs[uid].status == "complete":
-        rs_url = request.url_for("download_rounded_square_icon", uid=uid)
-        c_url = request.url_for("download_circle_icon", uid=uid)
-        jobs[uid].result.extend([rs_url, c_url])
+        url = request.url_for("download_products") + f"?uid={uid}"
+        jobs[uid].result = url
 
     return jobs[uid]
