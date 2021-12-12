@@ -1,0 +1,28 @@
+# Build stage
+FROM python:3.8 AS build
+
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir --upgrade --user -r requirements.txt
+
+# Run stage
+FROM python:3.8 as run
+
+WORKDIR /opt/api
+
+RUN groupadd -r genicons && \
+    useradd -r -g genicons -s /sbin/nologin genicons
+
+RUN chown -R genicons /opt/api
+
+COPY --from=build /root/.local /home/genicons/.local
+
+RUN chown -R genicons /home/genicons
+
+USER genicons
+
+EXPOSE 80
+
+COPY api .
+
+CMD ["/home/genicons/.local/bin/gunicorn", "main:app"]

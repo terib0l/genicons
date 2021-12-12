@@ -1,0 +1,3 @@
+.sql
+test/
+**/__pycache__/
