@@ -1,4 +1,4 @@
-version: "3.9"
+version: '3.9'
 
 services:
   db:
@@ -6,17 +6,12 @@ services:
     build: ./sql # 指定したディレクトリ配下のDockerfileを読み込む
     restart: always # 常にコンテナが落ちたら再起動させる
     tty: true # コンテナを起動させ続けることができる
-    environment: # コンテナ内の環境変数の設定
-      MYSQL_DATABASE: sample_db
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
-      MYSQL_ROOT_PASSWORD: password
+    env_file: # コンテナ内の環境変数の設定
+      - ./sql/.env
     ports:
       - "3306:3306"
     volumes:
-      - ./sql/initdb.d:/etc/mysql/initdb.d # 定義どおりにテーブル作成
       - ./sql/conf.d:/etc/mysql/conf.d # MySQLの基本設定（文字化け対策）
-      - ./log/mysql:/var/log/mysql # ログの保存
     networks:
       - genicons-api-net
 
@@ -28,9 +23,9 @@ services:
     restart: always
     tty: true
     ports:
-      - "8888:8888"
+      - "80:80" #- "8888:8888"
     volumes:
-      - ./api:/opt/api
+      - ./api/app:/app
     networks:
       - genicons-api-net
 
