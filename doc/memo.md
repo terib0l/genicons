@@ -1,48 +1,59 @@
 # To-Do
 
-* ~~バックエンドのベースを書いておく~~
-* ~~処理のプログレスを実装（画像生成に時間がかかる場合を想定）~~
-* ~~SQLの実装~~
-* => TDD(:Test Driven Development)に変更したい (11/26)
-  * TDDでDevOpsのDev部分はできる(plan -> code -> build -> test)
-  * Linter
-  * Test
-* Dockerが使える環境に以降
-  ~~* gunicornの起動テスト~~
-  ~~* DB操作関連のAPIを作成~~
-  * MySQLとの通信テスト
-* フロントエンドのベースを実装
-  * BackendをDockerで起動して通信テスト
-  * 画像生成時の表示
-  * 画像生成途中の表示
-  * 画像生成後の表示
-  * 作成物の展示部分を作成
-* ML実装
-  * TensorflowのDockerの起動テスト
-  * DockerのTensorflowでStyleTransferのテンプレを作成
-  * StyleTransferの実装テスト
-* Ops部分を作ってみる(release -> deploy -> operate -> monitor)
-  * AWSの準備とデプロイの自動化
-  * ウェブログとシステムログの収集と監視(Prometeus, Elasticsearch)
-* その他細かいこと
-  * どこの工程からSecを入れていくか？
-    * Pre-Commit Hooks
-    * Secret Management
-    * SCA / SAST
-    * DAST
-    * Security in IaC
-  * AWSサーバのIaC化(terraform, Ansible)
-  * MLとDBとFastAPIのサーバを分けてKubernetesで管理
+* => I wanna incorporate TDD (Test Driven Development).
+* First of all, code simple program
+  * ~~Implementation progress of task (For picture generation takes a long time )~~
+  * => Migrate environment using docker
+  * ~~Test of Gunicorn launch~~
+  * ~~Code Database related API~~
+  * ~~Test of connection between MySQL and FastAPI App~~
+  * Code Database CRUD
+  * Code test-code
+  * Code CI/CD workflow part of Dev
+  * Code frontend simply
+  * Code CI/CD workflow part of Sec
+* Next, Deploy to AWS
+  * Do AWS related config
+  * Code Configuration Management Tool File
+  * Code CI/CD workflow part of Ops
+  * Configure server administration and operation
+* Implementation part of Machine Learning
+  * Test of Tensorflow's Docker lanch
+  * Code template of StyleTransfer
+  * Test of StyleTransfer implementation
 
-#### Technical-Elements
+# Technical-Elements
 
-* Backend (それぞれDockerを利用する)
-  * FastAPI
-  * MySQL
-  * Tensorflow (for StyleTransfer)
+* Backend
+  * **FastAPI**
+  * **MySQL**
+  * **Tensorflow** (Machine Learning)
 * Frontend
-  * Vue.js
+  * **Vue.js**
 * Environment
-  * AWS
-* CI/CD
-  * GithubActions
+  * **AWS** (Infrastructure)
+  * IaC
+    * **Docker** (Container)
+    * **Terraform** (Configuration Management Tool for AWS Instance)
+    * **Ansible** (Configuration Management Tool for Server)
+  * Operate
+    * **Kubernetes** (Container Orchestration)
+    * **Prometheus** (System Resource Management)
+    * **Elastic** (SIEM / Log Visualization)
+  * Security
+    * **CrowdSec** (Firewall / IPS)
+* DevSecOps
+  * **GithubActions** (CI/CD)
+  * **Git-secret** (Secret Manager)
+  * **Flake** (Linter)
+  * **Pytest** (Testing)
+  * **Synopsys** (Software Composition Analysis / Static Application Security Testing)
+  * **OWASP ZAP** (Dynamic Application Security Testing)
+  * (Interactive Application Security Testing)
+
+# Temp
+
+* Dev (plan -> code -> build -> test)
+* Ops (release -> deploy -> operate -> monitor)
+* Sec (Threat Modeling -> Pre-Commit Hooks -> Secret Management -> SCA / SAST -> DAST / IAST)
+* IaC

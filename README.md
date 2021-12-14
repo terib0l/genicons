@@ -24,6 +24,10 @@ To study DevSecOps, I'll also use GihubActions to create a workflow that incorpo
 ```
 .
 ├── app/
+├── doc/
+├── sql/
+├── vue/
+├── docker-compose.yml
 └── README.md
 ```
 

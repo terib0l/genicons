@@ -27,4 +27,6 @@ USER genicons
 
 COPY app .
 
-CMD ["/home/genicons/.local/bin/gunicorn", "main:app"]
+EXPOSE 8888
+
+CMD ["/home/genicons/.local/bin/gunicorn"]
