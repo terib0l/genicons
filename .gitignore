@@ -1,6 +1,6 @@
 venv/
 __pycache__/
 .sql/
-sql-cp/
 .env
 index.py
+api/app/index.py
