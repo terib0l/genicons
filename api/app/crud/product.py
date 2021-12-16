@@ -5,7 +5,8 @@ from sqlalchemy.sql.expression import func
 from pydantic import UUID4, Field
 from zipfile import ZipFile
 
-import models, schemas
+import schemas
+from db import models
 
 def create(db: Session, product: schemas.Product) -> bool:
     try:
@@ -14,15 +15,7 @@ def create(db: Session, product: schemas.Product) -> bool:
                 )
         db.add(db_product)
         db.commit()
-        db.refresh(db_product)
         return True
-    except:
-        return False
-
-def all_read(db: Session):
-    try:
-        raise Exception("No implementation")
-        #return db.query(models.Product).all()
     except:
         return False
 
@@ -32,6 +25,7 @@ def read_by_id(db: Session, id: int):
     except:
         return False
 
+# Using
 def read_by_uuid(db: Session, uuid: UUID4) -> ZipFile:
     try:
         user = db.query(models.User).filter(models.User.uuid == uuid).first()
@@ -46,11 +40,15 @@ def read_by_uuid(db: Session, uuid: UUID4) -> ZipFile:
     finally:
         os.remove('./tmp.zip')
 
-def random_read(db: Session, num: int = Field(..., max_num=20, min_num=10)):
+# Using
+def random_read(
+        db: Session,
+        num: int = Field(..., min_num=3, max_num=12)
+    ):
     try:
-        max = count(db)
-        if num > max:
-            num = max
+        available_max = count(db)
+        if num > available_max:
+            num = available_max
         return db.query(models.Product).order_by(func.rand()).limit(num).all()
     except:
         return False
@@ -97,5 +95,8 @@ def delete_by_uuid(db: Session, uuid: UUID4) -> bool:
     except:
         return False
 
-def count(db: Session) -> int:
+# Using
+def count(
+        db: Session
+    ) -> int:
     return db.query(models.Product).count()

@@ -2,20 +2,18 @@ import logging
 
 from fastapi import FastAPI
 
-from router import input, output
-from db.db_init import Base, ENGINE
-
 logger = logging.getLogger("genicons")
 
 app = FastAPI()
-app.include_router(input.router)
-app.include_router(output.router)
 
-logger.warning("Initialization database")
+from router import generator, giver
+app.include_router(generator.router)
+app.include_router(giver.router)
+
+from db.db_init import Base, ENGINE
 Base.metadata.drop_all(ENGINE)
 Base.metadata.create_all(bind=ENGINE, checkfirst=False)
 
 @app.get("/")
 def index():
-    logger.info("Index")
-    return {"message": "Success!"}
+    return "Success!"

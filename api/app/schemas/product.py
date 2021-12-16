@@ -1,7 +1,7 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 class Product(BaseModel):
-    id: int = Field(None)
+    id: int
     rounded_square_icon: bytes
     circle_icon: bytes
 

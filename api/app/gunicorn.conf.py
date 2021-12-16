@@ -3,7 +3,7 @@ import multiprocessing
 
 wsgi_app = "main:app"
 
-bind = "127.0.0.1:8888"
+bind = "0.0.0.0:8888"
 
 worker_class = "uvicorn.workers.UvicornWorker"
 workers = multiprocessing.cpu_count() * 2 + 1

@@ -2,7 +2,3 @@ app/test/
 **/__pycache__/
 Dockerfile
 .dockerignore
-
-# Temporary
-tmp/
-app/.sql/
