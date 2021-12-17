@@ -1,6 +1,6 @@
 import logging
 
-from fastapi import UploadFile
+from fastapi import UploadFile, File
 from sqlalchemy.orm import Session
 from pydantic import UUID4, Field
 
@@ -9,12 +9,13 @@ from db import models
 
 logger = logging.getLogger("genicons")
 
-# Using
 def create(
         db: Session,
         user: User
     ) -> bool:
     try:
+        logger.info(f"{__name__}.{create.__name__}")
+
         db_user = models.User(
                 id=user.id,
                 img=user.img,
@@ -23,6 +24,7 @@ def create(
         db.add(db_user)
         db.commit()
         return True
+
     except Exception as e:
         logger.error(e)
         return False
@@ -32,7 +34,10 @@ def read(
         id: UUID4
     ):
     try:
+        logger.info(f"{__name__}.{read.__name__}")
+
         return db.query(models.User).filter(models.User.id == id).first()
+
     except Exception as e:
         logger.error(e)
         return False
@@ -41,15 +46,23 @@ def all_read(
         db: Session
     ):
     try:
-        return db.query(models.User).all()
+        logger.info(f"{__name__}.{all_read.__name__}")
+
+        ret = {}
+        datas = db.query(models.User).all()
+        for data in datas:
+            ret[data.id] = data.img_name
+        return ret
+
     except Exception as e:
         logger.error(e)
         return False
 
+'''
 def update_img(
         db: Session,
         id: UUID4,
-        img: UploadFile
+        img: UploadFile = File(...)
     ) -> bool:
     try:
         new_db_user = db.query(models.User).filter(models.User.id == id).first()
@@ -86,3 +99,4 @@ def delete(
     except Exception as e:
         logger.error(e)
         return False
+'''

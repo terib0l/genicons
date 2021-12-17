@@ -10,7 +10,7 @@ from module.schema import GenerateStatus, jobs
 from module.dependency import ValidateUploadFile, FileTypeName
 from db.session import get_db
 from schemas.user import User
-from crud import user
+from crud.user import create
 
 logger = logging.getLogger("genicons")
 
@@ -24,66 +24,6 @@ validate_upload_file = ValidateUploadFile(
             FileTypeName.jpg,
         ],
 )
-
-@router.get("/read")
-def read_all(
-        session: Session = Depends(get_db)
-    ):
-    """
-    Return data in user table
-
-    Args:
-    Return:
-
-        id: UUID
-        img: File
-        img_name: Str
-    """
-    try:
-        logger.info(read_all.__name__)
-
-        return user.all_read(session)
-
-    except Exception as e:
-        logger.error(e)
-        return JSONResponse(status_code=500, content="Internal Server Error")
-
-@router.post("/img/save")
-async def save_img(
-        img: UploadFile = Depends(validate_upload_file),
-        session: Session = Depends(get_db)
-    ):
-    """
-    Return path of recieved img
-
-    Args:
-
-        img: File
-
-    Return:
-
-        handle: Dict (UUID contained)
-    """
-    try:
-        logger.info(save_img.__name__)
-
-        handle = GenerateStatus()
-
-        with img.file as data:
-            user.create(
-                    session,
-                    User(
-                        id=handle.uid,
-                        img=data.read(),
-                        img_name=img.filename
-                    )
-            )
-
-        return handle
-
-    except Exception as e:
-        logger.error(e)
-        return JSONResponse(status_code=500, content="Internal Server Error")
 
 @router.post("/product/generate")
 async def generate_product(
@@ -103,11 +43,13 @@ async def generate_product(
         handle: Dict (UUID contained)
     """
     try:
+        logger.info(generate_product.__name__)
+
         handle = GenerateStatus()
         jobs[handle.uid] = handle
 
         with img.file as data:
-            user.create(
+            create(
                     session,
                     User(
                         id=handle.uid,
@@ -116,9 +58,9 @@ async def generate_product(
                     )
             )
 
-        background.add_task(ml_task, handle.uid)
+        background.add_task(ml_task, handle.uid, session)
 
-        return handle
+        return handle.uid
 
     except Exception as e:
         logger.error(e)
@@ -141,14 +83,13 @@ async def generating_status(
         handle: Dict (UUID contained)
     """
     try:
-        logger.info(uid)
-        logger.info(type(uid))
+        logger.info(generating_status.__name__)
+
         if jobs[uid].status == "complete":
             url = request.url_for("download_products", uid=uid)
-            logger.info(url)
-            jobs[uid].url = url
+            return JSONResponse(status_code=200, content={"Download URL": url})
 
-        return jobs[uid]
+        return JSONResponse(status_code=204, content={"status": jobs[uid].status, "progress": jobs[uid].progress})
 
     except Exception as e:
         logger.error(e)

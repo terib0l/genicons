@@ -1,58 +1,89 @@
 import os
+import logging
 
+from fastapi import File, UploadFile
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.expression import func
 from pydantic import UUID4, Field
 from zipfile import ZipFile
 
-import schemas
 from db import models
 
-def create(db: Session, product: schemas.Product) -> bool:
+logger = logging.getLogger("genicons")
+
+def create(
+        db: Session,
+        relation_id: UUID4,
+        rs_icon: UploadFile = File(...),
+        c_icon: UploadFile = File(...)
+    ) -> bool:
     try:
-        db_product = models.User(
-                products=[product.rounded_square_icon, product.circle_icon]
+        logger.info(f"{__name__}.{create.__name__}")
+
+        db_product = models.Product(
+                rounded_square_icon = rs_icon,
+                circle_icon = c_icon,
+                users_id = relation_id
                 )
         db.add(db_product)
         db.commit()
         return True
-    except:
+
+    except Exception as e:
+        logger.error(e)
         return False
 
-def read_by_id(db: Session, id: int):
+def read_by_uuid(
+        db: Session,
+        uid: UUID4
+    ):
     try:
-        return db.query(models.Product).filter(models.Product.id == id).first()
-    except:
-        return False
+        logger.info(f"{__name__}.{read_by_uuid.__name__}")
 
-# Using
-def read_by_uuid(db: Session, uuid: UUID4) -> ZipFile:
-    try:
-        user = db.query(models.User).filter(models.User.uuid == uuid).first()
+        user_data = db.query(models.Product).filter(models.Product.users_id == uid).first()
 
-        with ZipFile('tmp.zip', 'w') as zipObj:
-            zipObj.write(user.products.rounded_square_icon)
-            zipObj.write(user.products.circle_icon)
+        with ZipFile(f'result_{uid}.zip', 'w') as zipObj:
+            zipObj.write(user_data.rounded_square_icon)
+            zipObj.write(user_data.circle_icon)
 
         return zipObj
-    except:
-        raise Exception('read_by_uuid is error')
-    finally:
-        os.remove('./tmp.zip')
 
-# Using
+    except Exception as e:
+        logger.error(e)
+        return False
+
+    finally:
+        os.remove(f'./result_{uid}.zip')
+
 def random_read(
         db: Session,
         num: int = Field(..., min_num=3, max_num=12)
     ):
     try:
+        logger.info(f"{__name__}.{random_read.__name__}")
+
         available_max = count(db)
+        logger.info(f"Number of products: {available_max}")
+
         if num > available_max:
             num = available_max
-        return db.query(models.Product).order_by(func.rand()).limit(num).all()
-    except:
+
+        items = db.query(models.Product).order_by(func.rand()).limit(num).all()
+        with ZipFile(f'./gallery.zip', 'w') as zipObj:
+            for item in items:
+                zipObj.write(item.rounded_square_icon)
+                zipObj.write(item.circle_icon)
+
+        return zipObj
+
+    except Exception as e:
+        logger.error(e)
         return False
 
+    finally:
+        os.remove(f'./gallery.zip')
+
+'''
 def update_by_id(db: Session, new_product: schemas.Product) -> bool:
     try:
         if not new_product.id:
@@ -94,9 +125,16 @@ def delete_by_uuid(db: Session, uuid: UUID4) -> bool:
         return True
     except:
         return False
+'''
 
-# Using
 def count(
         db: Session
     ) -> int:
-    return db.query(models.Product).count()
+    try:
+        logger.info(f"{__name__}.{count.__name__}")
+
+        return db.query(models.Product).count()
+
+    except Exception as e:
+        logger.error(e)
+        return False
