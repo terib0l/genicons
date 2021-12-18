@@ -1,4 +1,9 @@
-FROM mysql:5.7
+FROM mysql:latest
 
 # MySQLの操作ログのファイルを作成
-RUN touch /var/log/mysql/mysqld.log
+RUN mkdir -p /var/log/mysql && \
+    touch /var/log/mysql/mysqld.log
+
+RUN chown -R mysql /var/log/mysql
+
+EXPOSE 3306

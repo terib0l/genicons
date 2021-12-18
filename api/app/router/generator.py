@@ -42,9 +42,9 @@ async def generate_product(
 
         handle: Dict (UUID contained)
     """
-    try:
-        logger.info(generate_product.__name__)
+    logger.info(generate_product.__name__)
 
+    try:
         handle = GenerateStatus()
         jobs[handle.uid] = handle
 
@@ -82,12 +82,12 @@ async def generating_status(
 
         handle: Dict (UUID contained)
     """
-    try:
-        logger.info(generating_status.__name__)
+    logger.info(generating_status.__name__)
 
+    try:
         if jobs[uid].status == "complete":
             url = request.url_for("download_products", uid=uid)
-            return JSONResponse(status_code=200, content={"Download URL": url})
+            return JSONResponse(status_code=200, content={"url": url})
 
         return JSONResponse(status_code=204, content={"status": jobs[uid].status, "progress": jobs[uid].progress})
 

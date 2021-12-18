@@ -7,7 +7,7 @@
   * ~~Test of Gunicorn launch~~
   * ~~Code Database related API~~
   * ~~Test of connection between MySQL and FastAPI App~~
-  * Code Database CRUD
+  * ~~Code Database CRUD~~
   * Code test-code
   * Code CI/CD workflow part of Dev
   * Code frontend simply

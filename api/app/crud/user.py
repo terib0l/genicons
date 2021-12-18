@@ -50,8 +50,9 @@ def all_read(
 
         ret = {}
         datas = db.query(models.User).all()
-        for data in datas:
-            ret[data.id] = data.img_name
+        if datas:
+            for data in datas:
+                ret[data.id] = data.img_name
         return ret
 
     except Exception as e:
