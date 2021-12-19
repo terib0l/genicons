@@ -77,7 +77,7 @@ def get_gallery(
         return JSONResponse(status_code=500, content="Internal Server Error")
 
 @router.get("/product/{uid}/download")
-async def download_products(
+def download_products(
         background: BackgroundTasks,
         uid: UUID4,
         session: Session = Depends(get_db)

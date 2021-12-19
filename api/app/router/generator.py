@@ -26,7 +26,7 @@ validate_upload_file = ValidateUploadFile(
 )
 
 @router.post("/product/generate")
-async def generate_product(
+def generate_product(
         background: BackgroundTasks,
         img: UploadFile = Depends(validate_upload_file),
         session: Session = Depends(get_db)
@@ -40,7 +40,7 @@ async def generate_product(
 
     Return:
 
-        handle: Dict (UUID contained)
+        uid: UUID4
     """
     logger.info(generate_product.__name__)
 
@@ -60,14 +60,14 @@ async def generate_product(
 
         background.add_task(ml_task, handle.uid, session)
 
-        return handle.uid
+        return {"uid": handle.uid}
 
     except Exception as e:
         logger.error(e)
         return JSONResponse(status_code=500, content="Internal Server Error")
 
 @router.get("/product/generate/status/{uid}")
-async def generating_status(
+def generating_status(
         request: Request,
         uid: UUID4
     ):
@@ -76,11 +76,18 @@ async def generating_status(
 
     Args:
 
-        uid: UUID
+        uid: UUID4
 
     Return:
 
-        handle: Dict (UUID contained)
+        Exist products:
+
+            url: Download url for products
+
+        Don't Exist products:
+
+            status: in_progress
+            progress: int
     """
     logger.info(generating_status.__name__)
 

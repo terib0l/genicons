@@ -23,7 +23,7 @@ jobs:
           flake8 $HOME/genicons/api/app --count --select=E9,F63,F7,F82 --show-source --statistics
       - name: Test with pytest
         run: |
-          pip install pytest pytest-env
+          pip install pytest pytest-env jsonschema
           cd $HOME/genicons/api/app/test && pytest
       - name: SCA & SAST with synopsys
       - name: DAST with owasp zap

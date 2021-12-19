@@ -13,9 +13,9 @@ def create(
         db: Session,
         user: User
     ) -> bool:
-    try:
-        logger.info(f"{__name__}.{create.__name__}")
+    logger.info(f"{__name__}.{create.__name__}")
 
+    try:
         db_user = models.User(
                 id=user.id,
                 img=user.img,
@@ -33,9 +33,9 @@ def read(
         db: Session,
         id: UUID4
     ):
-    try:
-        logger.info(f"{__name__}.{read.__name__}")
+    logger.info(f"{__name__}.{read.__name__}")
 
+    try:
         return db.query(models.User).filter(models.User.id == id).first()
 
     except Exception as e:
@@ -45,9 +45,9 @@ def read(
 def all_read(
         db: Session
     ):
-    try:
-        logger.info(f"{__name__}.{all_read.__name__}")
+    logger.info(f"{__name__}.{all_read.__name__}")
 
+    try:
         ret = {}
         datas = db.query(models.User).all()
         if datas:
