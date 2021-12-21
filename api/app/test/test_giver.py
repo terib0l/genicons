@@ -32,8 +32,6 @@ def test_read_all_users_in_case_of_some_datas():
     assert Draft7Validator(test_read_all_users_in_case_of_some_datas_schema).is_valid(response.json())
 
 def test_get_gallery_in_case_of_empty():
-    # Do I need to initialize DB
-
     num = random.randint(1, 12)
 
     response = client.get(f"/gallery/{num}/download")
@@ -42,8 +40,6 @@ def test_get_gallery_in_case_of_empty():
     assert response.json() == "No Content"
 
 def test_get_gallery_in_case_of_some_datas_in_db():
-    # Do I need to initialize DB
-
     loop = random.randint(1, 12)
     for _ in range(loop):
         img_name = random.choice(os.listdir("./img/"))

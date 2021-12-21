@@ -82,7 +82,7 @@ def generating_status(
 
         Exist products:
 
-            url: Download url for products
+            url: URL for download products
 
         Don't Exist products:
 

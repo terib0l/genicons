@@ -1,3 +1,4 @@
+import requests
 import asyncio
 import logging
 
@@ -52,3 +53,47 @@ async def ml_task(
 
     jobs[uid].status = "complete"
     logger.info(f"--- {ml_task.__name__} done ---")
+
+def call_style_transfer(
+        uid: UUID4,
+        session: Session
+    ):
+    """
+    Request to another backend server to work machine learning,
+    for starting Style Transfer work
+
+    Args:
+
+        uid: UUID
+
+    Return:
+    """
+    logger.info(call_style_transfer.__name__)
+
+    # Request backend server
+    #response = requests.get(f'http://{uid}')
+
+    # Make Products
+    user_data = user.read(session, uid)
+    product.create(session, user_data.id, user_data.img, user_data.img)
+    logger.debug("Complete making products")
+
+def status_style_transfer(
+        uid: UUID4
+    ):
+    """
+    Request to another backend server to work machine learning,
+    for checking progress status
+
+    Args:
+
+        uid: UUID
+
+    Return:
+    """
+    logger.info(status_style_transfer.__name__)
+
+    # Request backend server
+    response = requests.get(f'http://{uid}')
+
+    return response

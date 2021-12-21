@@ -29,4 +29,8 @@ def test_generator_validator():
     assert Draft7Validator(test_generate_in_case_of_products_not_made_yet_schema).is_valid(data)
 
 def test_giver_validator():
-    pass
+    uid = str(uuid4())
+    data = {uid: "test.jpg"}
+    assert Draft7Validator(test_read_all_users_in_case_of_some_datas_schema).is_valid(data)
+    assert Draft7Validator(test_get_gallery_in_case_of_some_datas_in_db_schema).is_valid(data)
+    assert Draft7Validator(test_download_products_in_case_of_products_have_made_schema).is_valid(data)
