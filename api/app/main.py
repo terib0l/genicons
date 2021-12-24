@@ -16,4 +16,5 @@ Base.metadata.create_all(bind=ENGINE, checkfirst=False)
 
 @app.get("/")
 def index():
+    logger.info("Index accessed.")
     return "Success!"
