@@ -8,6 +8,7 @@
   * ~~Code Database related API~~
   * ~~Test of connection between MySQL and FastAPI App~~
   * ~~Code Database CRUD~~
+  * Code sample tensorflow serving
   * Code test-code
   * Code CI/CD workflow part of Dev
   * Code frontend simply
@@ -27,7 +28,7 @@
 * Backend
   * **FastAPI**
   * **MySQL**
-  * **Tensorflow** (Machine Learning)
+  * **Tensorflow**
 * Frontend
   * **Vue.js**
 * Environment

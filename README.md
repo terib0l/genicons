@@ -23,18 +23,13 @@ To study DevSecOps, I'll also use GihubActions to create a workflow that incorpo
 
 ```
 .
-├── app/
+├── api/
 ├── doc/
 ├── sql/
 ├── vue/
-├── docker-compose.yml
+├── ml/
+├── tmp/
 └── README.md
-```
-
-## Setup
-
-```
-$ 
 ```
 
 ## License
