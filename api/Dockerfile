@@ -1,10 +1,12 @@
 # Build stage
 FROM python:3.8
 
-COPY requirements.txt .
+COPY pyproject.toml .
 
 RUN pip install --upgrade pip && \
-    pip install --no-cache-dir --user -r requirements.txt
+    pip install poetry
+
+RUN poetry install --no-dev
 
 WORKDIR /app
 

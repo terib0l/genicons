@@ -13,8 +13,3 @@ app.include_router(giver.router)
 from db.db_init import Base, ENGINE
 Base.metadata.drop_all(ENGINE)
 Base.metadata.create_all(bind=ENGINE, checkfirst=False)
-
-@app.get("/")
-def index():
-    logger.info("Index accessed.")
-    return "Success!"

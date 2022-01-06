@@ -1,12 +1,11 @@
 import logging
+import uuid
 
-from fastapi import APIRouter, Request, BackgroundTasks, UploadFile, Depends
+from fastapi import APIRouter, BackgroundTasks, UploadFile, Depends
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
-from pydantic import UUID4
 
-from module.ml import ml_task
-from module.schema import GenerateStatus, jobs
+from module.ml_caller import caller
 from module.dependency import ValidateUploadFile, FileTypeName
 from db.session import get_db
 from schemas.user import User
@@ -16,7 +15,7 @@ logger = logging.getLogger("genicons")
 
 router = APIRouter(
         tags=["generator"]
-        )
+)
 
 validate_upload_file = ValidateUploadFile(
         max_size=16777216,
@@ -45,58 +44,21 @@ def generate_product(
     logger.info(generate_product.__name__)
 
     try:
-        handle = GenerateStatus()
-        jobs[handle.uid] = handle
+        uid = uuid.uuid4()
 
         with img.file as data:
             create(
                     session,
                     User(
-                        id=handle.uid,
+                        id=uid,
                         img=data.read(),
                         img_name=img.filename
                     )
             )
 
-        background.add_task(ml_task, handle.uid, session)
+        background.add_task(caller, uid, session)
 
-        return {"uid": handle.uid}
-
-    except Exception as e:
-        logger.error(e)
-        return JSONResponse(status_code=500, content="Internal Server Error")
-
-@router.get("/product/generate/status/{uid}")
-def generating_status(
-        request: Request,
-        uid: UUID4
-    ):
-    """
-    Return Handle for progress of generating icons
-
-    Args:
-
-        uid: UUID4
-
-    Return:
-
-        Exist products:
-
-            url: URL for download products
-
-        Don't Exist products:
-
-            status: in_progress
-            progress: int
-    """
-    logger.info(generating_status.__name__)
-
-    try:
-        if jobs[uid].status == "complete":
-            url = request.url_for("download_products", uid=uid)
-            return JSONResponse(status_code=200, content={"url": url})
-
-        return JSONResponse(status_code=204, content={"status": jobs[uid].status, "progress": jobs[uid].progress})
+        return {"uid": uid}
 
     except Exception as e:
         logger.error(e)

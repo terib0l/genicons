@@ -17,16 +17,6 @@ def test_generator_validator():
     uid = str(uuid4())
     data = {"uid": uid}
     assert Draft7Validator(test_generate_product_schema).is_valid(data)
-    url = f"http://localhost:8888/product/{uid}/download"
-    data = {"url": url}
-    assert Draft7Validator(test_generate_in_case_of_products_have_made_schema).is_valid(data)
-    url = f"http://127.0.0.1:8888/product/{uid}/download"
-    data = {"url": url}
-    assert Draft7Validator(test_generate_in_case_of_products_have_made_schema).is_valid(data)
-    status = "in_progress"
-    progress = 4
-    data = {"status": status, "progress": progress}
-    assert Draft7Validator(test_generate_in_case_of_products_not_made_yet_schema).is_valid(data)
 
 def test_giver_validator():
     uid = str(uuid4())
