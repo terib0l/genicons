@@ -14,7 +14,7 @@ SQLALCHEMY_DATABASE_URL = f"mysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}?
 ENGINE = create_engine(
         SQLALCHEMY_DATABASE_URL,
         encoding = "utf-8",
-        echo = True
+        echo = False
 )
 
 SessionLocal = scoped_session(

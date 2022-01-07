@@ -9,10 +9,10 @@ def remove_file(
     ):
     logger.info(remove_file.__name__)
     if path:
-        logger.debug(path)
+        logger.debug(f"{remove_file.__name__}, {path}")
         if os.path.isfile(path): os.remove(path)
 
     if paths:
-        logger.debug(paths)
+        logger.debug(f"{remove_file.__name__}, {paths}")
         for p in paths:
             if os.path.isfile(p): os.remove(p)

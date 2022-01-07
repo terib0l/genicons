@@ -8,8 +8,7 @@
   * ~~Code Database related API~~
   * ~~Test of connection between MySQL and FastAPI App~~
   * ~~Code Database CRUD~~
-  * Code sample tensorflow serving
-  * Code test-code
+  * ~~Code test-code~~
   * Code CI/CD workflow part of Dev
   * Code frontend simply
   * Code CI/CD workflow part of Sec
@@ -19,6 +18,7 @@
   * Code CI/CD workflow part of Ops
   * Configure server administration and operation
 * Implementation part of Machine Learning
+  * Code sample tensorflow serving
   * Test of Tensorflow's Docker lanch
   * Code template of StyleTransfer
   * Test of StyleTransfer implementation

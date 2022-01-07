@@ -3,6 +3,7 @@ import logging
 from fastapi import FastAPI
 
 logger = logging.getLogger("genicons")
+logger.info("host=0.0.0.0, port=8888")
 
 app = FastAPI()
 

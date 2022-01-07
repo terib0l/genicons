@@ -45,6 +45,8 @@ def read_by_uuid(
         logger.info(f"{__name__}.{read_by_uuid.__name__}")
 
         user_data = db.query(models.Product).filter(models.Product.users_id == uid).first()
+        if not user_data:
+            raise Exception("No Products data by its uuid")
 
         # First, make img-files
         with open(handle_jpg[0], 'wb') as rs_file:
@@ -71,16 +73,19 @@ def random_read(
     ) -> bool:
     logger.info(f"{__name__}.{random_read.__name__}")
 
+    available_max = count(db)
+    logger.info(f"Number of products: {available_max}")
+
+    if not available_max:
+        return False
+
+    if num > available_max: num = available_max
+
     handle_jpg = []
     for i in range(num):
-        handle_jpg.append([f'./rs_{i}.jpg', f'./c_{i}.jpg'])
+        handle_jpg.append([f'./rs_{i+1}.jpg', f'./c_{i+1}.jpg'])
 
     try:
-        available_max = count(db)
-        logger.info(f"Number of products: {available_max}")
-
-        if num > available_max: num = available_max
-
         user_datas = db.query(models.Product).order_by(func.rand()).limit(num).all()
 
         # First, make img-files
@@ -89,7 +94,7 @@ def random_read(
                 rs_file.write(user_data.rounded_square_icon)
             with open(handle_jpg[i][1], 'wb') as c_file:
                 c_file.write(user_data.circle_icon)
-        logger.info(os.listdir())
+        logger.info(f"{random_read.__name__} {os.listdir()}")
 
         # Second, make zip-file contained img-files
         with zipfile.ZipFile('./gallery.zip', 'w') as zipObj:
