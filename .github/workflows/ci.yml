@@ -50,6 +50,11 @@ jobs:
         run: |
           cd api
           poetry run flake8 ./app --count --show-source --statistics --exit-zero
+      - name: Check MySQL Container
+        run: |
+          docker ps -a
+          mysql --protocol=tcp -h localhost -P 3306 -u root -proot_password -e "SHOW DATABASES;"
+          mysql --protocol=tcp -h localhost -P 3306 -u user -ppassword -e "SHOW DATABASES;"
       - name: Test with pytest
         run: |
           cd api
