@@ -40,6 +40,7 @@ jobs:
       - name: Poetry install dependencies
         run: |
           cd api
+          ls -a
           poetry --version
           poetry install --no-interaction
       - name: Lint with flake8
