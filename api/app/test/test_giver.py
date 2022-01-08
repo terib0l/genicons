@@ -6,12 +6,15 @@ import random
 from fastapi.testclient import TestClient
 from jsonschema import Draft7Validator
 from zipfile import ZipFile
+from pathlib import Path
 
 from main import app
 from db.db_init import Base, ENGINE
 from test.schema.schema_giver import *
 
 client = TestClient(app)
+
+current_path = Path(__file__).resolve().parent
 
 def test_read_all_users_in_case_of_empty():
     # Initialization DB for make DB empty
@@ -28,8 +31,8 @@ def test_read_all_users_in_case_of_some_datas():
     # Make some datas
     loop = random.randint(1, 3)
     for _ in range(loop):
-        img_name = random.choice(os.listdir("./img/"))
-        img_path = "./img/" + img_name
+        img_name = random.choice(os.listdir(str(Path(current_path, 'img/'))))
+        img_path = str(Path(current_path, "img/", img_name))
 
         client.post(
                 "/product/generate",
@@ -58,8 +61,8 @@ def test_get_gallery_in_case_of_some_datas_in_db():
     # Make some datas
     loop = random.randint(1, 12)
     for _ in range(loop):
-        img_name = random.choice(os.listdir("./img/"))
-        img_path = "./img/" + img_name
+        img_name = random.choice(os.listdir(str(Path(current_path, 'img/'))))
+        img_path = str(Path(current_path, "img/", img_name))
 
         client.post(
                 "/product/generate",
@@ -92,8 +95,8 @@ def test_download_products_in_case_of_products_not_made_yet():
 
 def test_download_products_in_case_of_products_have_made():
     # First, generate product
-    img_name = random.choice(os.listdir("./img/"))
-    img_path = "./img/" + img_name
+    img_name = random.choice(os.listdir(str(Path(current_path, 'img/'))))
+    img_path = str(Path(current_path, "img/", img_name))
 
     response = client.post(
             "/product/generate",

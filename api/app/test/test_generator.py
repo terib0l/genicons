@@ -3,15 +3,18 @@ import random
 
 from fastapi.testclient import TestClient
 from jsonschema import Draft7Validator
+from pathlib import Path
 
 from main import app
 from test.schema.schema_generator import *
 
 client = TestClient(app)
 
+current_path = Path(__file__).resolve().parent
+
 def test_generate_product():
-    img_name = random.choice(os.listdir("./img/"))
-    img_path = "./img/" + img_name
+    img_name = random.choice(os.listdir(str(Path(current_path, 'img/'))))
+    img_path = str(Path(current_path, "img/", img_name))
 
     response = client.post(
             "/product/generate",
