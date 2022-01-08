@@ -3,6 +3,7 @@ version: '3.9'
 services:
   db:
     container_name: "db"
+    hostname: genicons_db
     build: ./sql
     restart: always
     tty: true
@@ -10,8 +11,6 @@ services:
       - ./sql/.env
     ports:
       - "3306:3306"
-    volumes:
-      - ./sql/conf.d:/etc/mysql/conf.d
     networks:
       - genicons-api-net
 
@@ -26,8 +25,6 @@ services:
       - ./api/.env
     ports:
       - "8888:8888"
-    volumes:
-      - ./api/app:/app
     networks:
       - genicons-api-net
 
