@@ -1,0 +1,51 @@
+name: Genicons CI
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version: [3.8]
+        poetry-version: [1.1.12]
+
+    services:
+      db:
+        image: mysql
+        env:
+          MYSQL_DATABASE: sample_db
+          MYSQL_USER: user
+          MYSQL_PASSWORD: password
+          MYSQL_ROOT_PASSWORD: password
+        ports:
+          - 3306:3306
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Poetry
+        uses: abatilo/actions-poetry@v2.1.3
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
+      - name: Poetry install dependencies
+        run: |
+          cd api
+          ls -a
+          poetry --version
+          poetry install --no-interaction
+      - name: Lint with flake8
+        run: |
+          poetry run flake8 ./app --count --show-source --statistics
+      - name: Test with pytest
+        run: |
+          poetry run pytest --rootdir=./app/test/ -c ./app/test/pytest.ini
