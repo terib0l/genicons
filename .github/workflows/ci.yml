@@ -40,12 +40,12 @@ jobs:
       - name: Poetry install dependencies
         run: |
           cd api
-          ls -a
-          poetry --version
           poetry install --no-interaction
       - name: Lint with flake8
         run: |
+          cd api
           poetry run flake8 ./app --count --show-source --statistics
       - name: Test with pytest
         run: |
+          cd api
           poetry run pytest --rootdir=./app/test/ -c ./app/test/pytest.ini
