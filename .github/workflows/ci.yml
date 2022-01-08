@@ -44,7 +44,7 @@ jobs:
       - name: Lint with flake8
         run: |
           cd api
-          poetry run flake8 ./app --count --show-source --statistics
+          poetry run flake8 ./app --count --show-source --statistics --exit-zero
       - name: Test with pytest
         run: |
           cd api
