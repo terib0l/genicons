@@ -9,7 +9,7 @@
   * ~~Test of connection between MySQL and FastAPI App~~
   * ~~Code Database CRUD~~
   * ~~Code test-code~~
-  * Code CI/CD workflow part of Dev
+  * ~~Code CI/CD workflow part of Dev~~
   * Code frontend simply
   * Code CI/CD workflow part of Sec
 * Next, Deploy to AWS

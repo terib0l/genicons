@@ -19,19 +19,6 @@ For the front end, I'll use Vue.js as it is easy to develop SPA.
 Then deploy this app on AWS.  
 To study DevSecOps, I'll also use GihubActions to create a workflow that incorporates security checks.
 
-## Contents
-
-```
-.
-├── api/
-├── doc/
-├── sql/
-├── vue/
-├── ml/
-├── tmp/
-└── README.md
-```
-
 ## License
 
 [MIT](https://github.com/terib0l/genicons/blob/main/LICENSE)
