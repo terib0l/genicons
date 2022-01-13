@@ -1,5 +1,7 @@
 # genicons
 
+[![Genicons CI](https://github.com/terib0l/genicons/actions/workflows/main.yml/badge.svg)](https://github.com/terib0l/genicons/actions/workflows/main.yml)
+
 ##### Ongoing
 ##### The project is expected to be completed by March 2022.
 
