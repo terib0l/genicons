@@ -13,15 +13,15 @@ services:
     networks:
       - genicons-api-net
 
-  api:
+  fastapi:
     links:
       - db
-    container_name: "api"
-    build: ./api
+    container_name: "fastapi"
+    build: ./fastapi
     restart: always
     tty: true
     env_file:
-      - ./api/.env
+      - ./fastapi/.env
     ports:
       - "8888:8888"
     networks:
