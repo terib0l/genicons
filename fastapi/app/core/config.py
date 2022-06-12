@@ -7,7 +7,7 @@ PROJECT_NAME = "Genicons"
 VERSION = "1.0.0"
 DEBUG = True
 
-DB_HOST = config("DB_HOST", cast=str, default="127.0.0.1")
-DB_NAME = config("DB_NAME", cast=str, default="sample_db")
-DB_USER = config("DB_USER", cast=str, default="user")
-DB_PASSWORD = config("DB_PASSWORD", cast=Secret, default="password")
+MYSQL_HOST = config("MYSQL_HOST", cast=str, default="127.0.0.1")
+MYSQL_NAME = config("MYSQL_NAME", cast=str, default="sample_db")
+MYSQL_USER = config("MYSQL_USER", cast=str, default="user")
+MYSQL_PASSWORD = config("MYSQL_PASSWORD", cast=Secret, default="password")
