@@ -1,0 +1,18 @@
+name: Genicons CI prod
+
+on:
+  workflow_run:
+    workflows: ["Genicons CI stage"]
+    types:
+      - completed
+
+jobs:
+  stage:
+    runs-on: ubuntu-latest
+          
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      ## Migration to "Production" env
+      
+      ## Monitoring, Guardrails

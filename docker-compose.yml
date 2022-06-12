@@ -7,7 +7,7 @@ services:
     restart: always
     tty: true
     env_file:
-      - ./sql/.env
+      - ./sql/.env.init
     ports:
       - "3306:3306"
     networks:
