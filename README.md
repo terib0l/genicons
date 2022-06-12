@@ -1,6 +1,8 @@
 # genicons
 
-[![Genicons CI](https://github.com/terib0l/genicons/actions/workflows/main.yml/badge.svg)](https://github.com/terib0l/genicons/actions/workflows/main.yml)
+[![Genicons CI build](https://github.com/terib0l/genicons/actions/workflows/build.yml/badge.svg)](https://github.com/terib0l/genicons/actions/workflows/build.yml)
+[![Genicons CI stage](https://github.com/terib0l/genicons/actions/workflows/stage.yml/badge.svg)](https://github.com/terib0l/genicons/actions/workflows/stage.yml)
+[![Genicons CI prod](https://github.com/terib0l/genicons/actions/workflows/prod.yml/badge.svg)](https://github.com/terib0l/genicons/actions/workflows/prod.yml)
 
 ##### Ongoing
 ##### The project is expected to be completed by December 2022.
