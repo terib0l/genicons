@@ -13,6 +13,11 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
-      ## Migration to "Staging" env
-      - name: Make Docker container
-      ## DAST, Inflastructure scan
+      - name: Migration to Staging env
+        run: |
+          echo "Use Terraform?"
+          echo "Use Ansible?"
+      - name: DAST, Inflastructure scan
+        run: |
+          echo "NMAP to AWS staging env"
+          echo "OWASP ZAP to AWS staging env"

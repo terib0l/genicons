@@ -13,6 +13,9 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
-      ## Migration to "Production" env
-      
-      ## Monitoring, Guardrails
+      - name: Migration to "Production" env
+        run: |
+          echo "Use Kubernetes?"
+      - name: Monitoring, Guardrails
+        run: |
+          echo "??"
