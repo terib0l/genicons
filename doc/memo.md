@@ -1,36 +1,12 @@
-# To-Do
-
-* => I wanna incorporate TDD (Test Driven Development).
-* First of all, code simple program
-  * ~~Implementation progress of task (For picture generation takes a long time )~~
-  * => Migrate environment using docker
-  * ~~Test of Gunicorn launch~~
-  * ~~Code Database related API~~
-  * ~~Test of connection between MySQL and FastAPI App~~
-  * ~~Code Database CRUD~~
-  * ~~Code test-code~~
-  * ~~Code CI/CD workflow part of Dev~~
-  * Code frontend simply
-  * Code CI/CD workflow part of Sec
-* Next, Deploy to AWS
-  * Do AWS related config
-  * Code Configuration Management Tool File
-  * Code CI/CD workflow part of Ops
-  * Configure server administration and operation
-* Implementation part of Machine Learning
-  * Code sample tensorflow serving
-  * Test of Tensorflow's Docker lanch
-  * Code template of StyleTransfer
-  * Test of StyleTransfer implementation
-
-# Technical-Elements
+# Technical Elements
 
 * Backend
   * **FastAPI**
   * **MySQL**
   * **Tensorflow**
 * Frontend
-  * **Vue.js**
+  * **Nuxt.js**
+  * **Typescript**
 * Environment
   * **AWS** (Infrastructure)
   * IaC
@@ -45,12 +21,14 @@
     * **CrowdSec** (Firewall / IPS)
 * DevSecOps
   * **GithubActions** (CI/CD)
-  * **Git-secret** (Secret Manager)
-  * **Flake** (Linter)
+  * Pre-commit
+    * **Flake** (Linter)
+    * **Black** (Formatter)
+    * **Detect-secrets** (Secret Manager)
   * **Pytest** (Testing)
-  * **Synopsys** (Software Composition Analysis / Static Application Security Testing)
-  * **OWASP ZAP** (Dynamic Application Security Testing)
-  * (Interactive Application Security Testing)
+  * **Trivy** (SCA / SAST=>IaC)
+  * **Synopsys** (SAST=>Web)
+  * **OWASP ZAP** (DAST)
 
 # Temp
 
