@@ -4,14 +4,18 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 
 from app.core.config import MYSQL_HOST, MYSQL_NAME, MYSQL_USER, MYSQL_PASSWORD
 
-SQLALCHEMY_DATABASE_URL = (
-    f"mysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}/{MYSQL_NAME}?charset=utf8"
+SQLALCHEMY_DATABASE_URL = "mysql://{}:{}@{}/{}?charset=utf8".format(
+    MYSQL_USER, MYSQL_PASSWORD, MYSQL_HOST, MYSQL_NAME
 )
 
-ENGINE = create_engine(SQLALCHEMY_DATABASE_URL, encoding="utf-8", echo=False)
+ENGINE = create_engine(SQLALCHEMY_DATABASE_URL, encoding="utf-8", echo=True)
 
 SessionLocal = scoped_session(
-    sessionmaker(autocommit=False, autoflush=False, bind=ENGINE)
+    sessionmaker(
+        autocommit=False,
+        autoflush=False,
+        bind=ENGINE,
+    )
 )
 
 Base = declarative_base()

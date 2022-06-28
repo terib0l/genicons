@@ -26,7 +26,3 @@ To study DevSecOps, I'll also use GihubActions to create a workflow that incorpo
 ## License
 
 [MIT](https://github.com/terib0l/genicons/blob/main/LICENSE)
-
-## Memo
-
-[Memo](https://github.com/terib0l/genicons/tree/main/doc/memo.md)
