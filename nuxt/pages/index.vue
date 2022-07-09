@@ -2,30 +2,24 @@
 </script>
 
 <template>
-  <div class="main">
-    <h1>Welcome!!</h1>
-    <NuxtLink class="nl" to="/making">&gt;&gt; Making</NuxtLink>
-    <NuxtLink class="nl" to="/square">&gt;&gt; Garally</NuxtLink>
-    <NuxtLink class="nl" to="/contact">&gt;&gt; Contact</NuxtLink>
+  <div class="w-fit mx-auto">
+    <h1 class="font-bold text-4xl text-gray-300 m-10 p-10">
+      Welcome
+    </h1>
+    <form class="flex items-center space-x-6">
+      <div class="shrink-0">
+        <img class="h-16 w-16 object-cover rounded-full" src="https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1361&q=80" alt="Current profile photo" />
+      </div>
+      <label class="block">
+        <span class="sr-only">Choose profile photo</span>
+        <input type="file" class="block w-full text-sm text-slate-500
+          file:mr-4 file:py-2 file:px-4
+          file:rounded-full file:border-0
+          file:text-sm file:font-semibold
+          file:bg-violet-50 file:text-violet-700
+          hover:file:bg-violet-100
+        "/>
+      </label>
+    </form>
   </div>
 </template>
-
-<style>
-.main {
-  text-align: center;
-}
-
-h1 {
-  color: white;
-}
-
-.nl:link {
-  padding: 20px 20px;
-  font-size: 20px;
-  text-decoration: none;
-}
-
-.nl:visited {
-  color: aquamarine;
-}
-</style>

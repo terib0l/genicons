@@ -26,3 +26,8 @@ To study DevSecOps, I'll also use GihubActions to create a workflow that incorpo
 ## License
 
 [MIT](https://github.com/terib0l/genicons/blob/main/LICENSE)
+
+## Thanks to
+
+[SVG REPO](https://www.svgrepo.com/)
+[ICONSVG](https://iconsvg.xyz/)

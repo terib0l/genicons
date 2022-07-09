@@ -13,7 +13,13 @@ const sendText = (() => {
 </script>
 
 <template>
-  <h1>Contact Form</h1>
-  <input type="textarea" v-model="text" />
-  <button @click="sendText">Click</button>
+  <div class="halloween mx-10 my-5 justify-center">
+    <div>
+      <h1>Contact Form</h1>
+    </div>
+    <div>
+      <textarea class="textarea textarea-success p-10" v-model="text"></textarea>
+      <button @click="sendText" class="btn btn-success mx-5">Click</button>
+    </div>
+  </div>
 </template>

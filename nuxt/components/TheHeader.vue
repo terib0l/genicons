@@ -1,22 +1,20 @@
 <template>
-  <header id="header">
-    <div class="components">
-      <p>Genicons Projects</p>
+  <nav class="flex items-center justify-between flex-wrap bg-gray-300 p-6 m-5 rounded">
+    <div class="flex items-center flex-shrink-0 text-emerald-500 mr-6">
+      <img src="https://www.svgrepo.com/show/352776/hand-lizard.svg" class="w-12 h-12">
+      <span class="font-semibold text-xl tracking-tight pl-4">GENICONS</span>
     </div>
-  </header>
+    <!-- <div class="w-full block flex-grow lg:flex lg:items-center lg:w-auto mr-4"> -->
+    <div class="mr-4">
+      <NuxtLink to="/" class="inline-block text-base px-4 py-2 leading-none text-white bg-emerald-500 hover:border-transparent hover:text-white hover:bg-gray-900 mt-4 mr-2 lg:mt-0">
+        HOME
+      </NuxtLink>
+      <NuxtLink to="/entries" class="inline-block text-base px-4 py-2 leading-none text-white bg-emerald-500 hover:border-transparent hover:text-white hover:bg-gray-900 mt-4 mr-2 lg:mt-0">
+        Entries
+      </NuxtLink>
+      <NuxtLink to="/form" class="inline-block text-base px-4 py-2 leading-none text-white bg-emerald-500 hover:border-transparent hover:text-white hover:bg-gray-900 mt-4 lg:mt-0">
+        Contact Form
+      </NuxtLink>
+    </div>
+  </nav>
 </template>
-
-<style>
-#header {
-  position: relative;
-  background: #222;
-}
-
-.components {
-  color: white;
-  text-align: center;
-  padding: 10px 10px;
-  border-bottom: 1px solid #212;
-  font-size: 30px;
-}
-</style>
