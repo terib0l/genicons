@@ -1,27 +1,20 @@
-import os
-import random
 import pytest
 
 from fastapi.testclient import TestClient
 from jsonschema import Draft7Validator
-from pathlib import Path
 
 from main import app
 from app.test.schema.schema_generator import test_generate_product_schema
 
 client = TestClient(app)
 
-current_path = Path(__file__).resolve().parent
-
 
 @pytest.mark.generate_product
-def test_generate_product():
-    img_name = random.choice(os.listdir(str(Path(current_path, "img/"))))
-    img_path = str(Path(current_path, "img/", img_name))
-
+@pytest.mark.parametrize("some_data_setup", [1], indirect=True)
+def test_generate_product(random_image):
     response = client.post(
         "/product/generate",
-        files={"img": (img_name, open(img_path, "rb"), "image/jpeg")},
+        files={"img": (random_image.name, open(random_image.path, "rb"), "image/jpeg")},
     )
 
     assert response.status_code == 200

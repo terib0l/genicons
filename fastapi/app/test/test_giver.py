@@ -1,5 +1,4 @@
 import io
-import os
 import uuid
 import random
 import pytest
@@ -7,10 +6,8 @@ import pytest
 from fastapi.testclient import TestClient
 from jsonschema import Draft7Validator
 from zipfile import ZipFile
-from pathlib import Path
 
 from main import app
-from app.db.db_init import Base, ENGINE
 from app.test.schema.schema_giver import (
     test_read_all_users_in_case_of_some_datas_schema,
     test_get_gallery_in_case_of_some_datas_in_db_data_schema,
@@ -20,31 +17,10 @@ from app.test.schema.schema_giver import (
 
 client = TestClient(app)
 
-current_path = Path(__file__).resolve().parent
-
 
 @pytest.mark.read_all_users
-def test_read_all_users():
-    # In case of Empty
-    Base.metadata.drop_all(ENGINE)
-    Base.metadata.create_all(bind=ENGINE, checkfirst=False)
-
-    response = client.get("/users/all/read")
-
-    assert response.status_code == 200
-    assert response.json() == {}
-
-    # In case of Some Datas
-    loop = random.randint(1, 3)
-    for _ in range(loop):
-        img_name = random.choice(os.listdir(str(Path(current_path, "img/"))))
-        img_path = str(Path(current_path, "img/", img_name))
-
-        client.post(
-            "/product/generate",
-            files={"img": (img_name, open(img_path, "rb"), "image/jpeg")},
-        )
-
+@pytest.mark.parametrize("some_data_setup", [3], indirect=True)
+def test_read_all_users(some_data_setup):
     response = client.get("/users/all/read")
 
     assert response.status_code == 200
@@ -53,12 +29,8 @@ def test_read_all_users():
     )
 
 
-@pytest.mark.get_gallery
-def test_get_gallery():
-    # In case of Empty
-    Base.metadata.drop_all(ENGINE)
-    Base.metadata.create_all(bind=ENGINE, checkfirst=False)
-
+@pytest.mark.get_gallery_empty
+def test_get_gallery_from_empty():
     num = random.randint(1, 12)
 
     response = client.get(f"/gallery/{num}/download")
@@ -66,18 +38,11 @@ def test_get_gallery():
     assert response.status_code == 204
     assert response.json() == "No Content"
 
-    # In case of Some Datas
-    loop = random.randint(1, 12)
-    for _ in range(loop):
-        img_name = random.choice(os.listdir(str(Path(current_path, "img/"))))
-        img_path = str(Path(current_path, "img/", img_name))
 
-        client.post(
-            "/product/generate",
-            files={"img": (img_name, open(img_path, "rb"), "image/jpeg")},
-        )
-
-    num = random.randint(1, loop)
+@pytest.mark.get_gallery
+@pytest.mark.parametrize("some_data_setup", [10], indirect=True)
+def test_get_gallery(some_data_setup):
+    num = random.randint(1, 10)
     response = client.get(f"/gallery/{num}/download")
 
     assert response.status_code == 200
@@ -93,28 +58,19 @@ def test_get_gallery():
     ).is_valid(dict(response.headers))
 
 
-@pytest.mark.download_products
-def test_download_products():
-    # In case of Products Not Made Yet
-    Base.metadata.drop_all(ENGINE)
-    Base.metadata.create_all(bind=ENGINE, checkfirst=False)
-
+@pytest.mark.download_products_empty
+def test_download_products_from_empty():
     uid = uuid.uuid4()
     response = client.get(f"/product/{uid}/download")
 
     assert response.status_code == 204
     assert response.json() == "Product is empty"
 
-    # In case of Products Have Made
-    img_name = random.choice(os.listdir(str(Path(current_path, "img/"))))
-    img_path = str(Path(current_path, "img/", img_name))
 
-    response = client.post(
-        "/product/generate",
-        files={"img": (img_name, open(img_path, "rb"), "image/jpeg")},
-    )
-
-    data = response.json()
+@pytest.mark.download_products
+@pytest.mark.parametrize("some_data_setup", [1], indirect=True)
+def test_download_products(some_data_setup):
+    data = some_data_setup.json()
     uid = data["uid"]
     response = client.get(f"/product/{uid}/download")
 
