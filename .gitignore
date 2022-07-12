@@ -1,3 +1,5 @@
 __pycache__/
 .env
 index.py
+./fastapi/app/alembic/versions/*.py
+.pytest_cache/

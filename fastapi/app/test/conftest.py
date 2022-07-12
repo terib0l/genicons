@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from fastapi.testclient import TestClient
 
 from main import app
-from app.db.db_init import Base, ENGINE
+from app.db.session import Base, ENGINE
 
 current_path = Path(__file__).resolve().parent
 

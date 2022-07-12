@@ -3,7 +3,7 @@ repos:
     rev: 4.0.1
     hooks:
       - id: flake8
-        exclude: ^(nuxt/|tmp/|sql/|scripts/|doc/)
+        exclude: ^(nuxt/|tmp/|sql/|scripts/|doc/|fastapi/app/alembic/)
         args: ["--count", "--statistics", "--max-line-length", "88"]
   - repo: https://github.com/psf/black
     rev: 22.3.0
@@ -14,4 +14,4 @@ repos:
     rev: v1.2.0
     hooks:
       - id: detect-secrets
-        args: ['--exclude-lines', 'D:MYSQL_PASSWORD=.*$']
+        args: ['--exclude-lines', 'D:MYSQL_PASSWORD=.*$', '--exclude-lines', '^(down_)?revision.*$']
