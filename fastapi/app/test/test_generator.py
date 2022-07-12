@@ -10,7 +10,6 @@ client = TestClient(app)
 
 
 @pytest.mark.generate_product
-@pytest.mark.parametrize("some_data_setup", [1], indirect=True)
 def test_generate_product(random_image):
     response = client.post(
         "/product/generate",

@@ -1,15 +1,17 @@
 from typing import List
-from pydantic import BaseModel, Field
-from pydantic.types import UUID4
+from pydantic import EmailStr
+from pydantic import BaseModel
 
 from app.api.schema.product import Product
 
 
 class User(BaseModel):
-    id: UUID4
-    img: bytes
-    img_name: str = Field(..., max_length=20)
-    products: List[Product] = []
+    id: int
+    name: str
+    email: EmailStr
+    premium: bool
+
+    products: List[Product]
 
     class Config:
         orm_mode = True

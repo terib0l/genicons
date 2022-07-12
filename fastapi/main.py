@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.base import api_router
-from app.db.db_init import Base, ENGINE
+from app.db.session import Base, ENGINE
 from app.core.config import PROJECT_NAME, VERSION, DEBUG
 
 logger = logging.getLogger("genicons")

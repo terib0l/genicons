@@ -13,7 +13,9 @@ def create(db: Session, user: User) -> bool:
     logger.info(f"{__name__}.{create.__name__}")
 
     try:
-        db_user = models.User(id=user.id, img=user.img, img_name=user.img_name)
+        db_user = models.User(
+            id=user.id, name=user.name, email=user.email, premium=False
+        )
         db.add(db_user)
         db.commit()
         return True
