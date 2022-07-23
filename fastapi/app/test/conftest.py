@@ -1,15 +1,49 @@
 import os
+import re
 import random
 import pytest
+import pytest_asyncio
+from faker import Faker
 from pathlib import Path
 from dataclasses import dataclass
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker
 
-from fastapi.testclient import TestClient
+from app.core.config import DATABASE_URL
+from app.db.session import Base
+from app.db import models
 
-from main import app
-from app.db.session import Base, ENGINE
+CURRENT_PATH = Path(__file__).resolve().parent
 
-current_path = Path(__file__).resolve().parent
+FAKE = Faker()
+
+SQLALCHEMY_DATABASE_URL = re.sub("mysql", "mysql+aiomysql", DATABASE_URL)
+
+
+@pytest_asyncio.fixture(scope="function", autouse=True)
+async def async_session():
+    engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=False)
+
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
+
+    async_session = sessionmaker(
+        bind=engine, class_=AsyncSession, expire_on_commit=False
+    )
+    async with async_session() as session:
+        async with session.begin():
+            session.add_all(
+                [
+                    models.User(name=FAKE.name(), email=FAKE.email(), premium=False),
+                    models.User(name=FAKE.name(), email=FAKE.email(), premium=False),
+                    models.User(name=FAKE.name(), email=FAKE.email(), premium=False),
+                ]
+            )
+
+    await engine.dispose()
+
+    yield
 
 
 @dataclass
@@ -18,33 +52,19 @@ class Image:
     path: str
 
 
-@pytest.fixture()
+@pytest.fixture(scope="function")
 def random_image():
-    name = random.choice(os.listdir(str(Path(current_path, "img/"))))
-    path = str(Path(current_path, "img/", name))
+    name = random.choice(os.listdir(str(Path(CURRENT_PATH, "img/"))))
+    path = str(Path(CURRENT_PATH, "img/", name))
 
     image = Image(name=name, path=path)
 
     return image
 
 
-@pytest.fixture(autouse=True)
-def db_empty():
-    Base.metadata.drop_all(ENGINE)
-    Base.metadata.create_all(bind=ENGINE, checkfirst=False)
-
-
-@pytest.fixture()
-def some_data_setup(request):
-    client = TestClient(app)
-    loop = random.randint(1, request.param)
-
-    for _ in range(loop):
-        img = random_image()
-
-        response = client.post(
-            "/product/generate",
-            files={"img": (img.name, open(img.path, "rb"), "image/jpeg")},
-        )
-
-    return response
+@pytest.fixture(scope="function")
+def random_user():
+    return {
+        "name": FAKE.name(),
+        "email": FAKE.email(),
+    }

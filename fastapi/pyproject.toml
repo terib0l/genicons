@@ -11,18 +11,46 @@ uvicorn = "^0.16.0"
 PyYAML = "^6.0"
 python-dotenv = "^0.19.2"
 python-multipart = "^0.0.5"
-SQLAlchemy = "^1.4.29"
+SQLAlchemy = {extras = ["asyncio"], version = "^1.4.39"}
 aiofiles = "^0.8.0"
 requests = "^2.27.1"
 SQLAlchemy-Utils = "^0.38.2"
 mysqlclient = "^2.1.0"
 alembic = "^1.8.0"
+pydantic = {extras = ["email"], version = "^1.9.1"}
+aiomysql = "^0.1.1"
+pytest-asyncio = "^0.19.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"
 pytest-env = "^0.6.2"
 pynvim = "^0.4.3"
 jsonschema = "^4.3.3"
+Faker = "^13.15.1"
+httpx = "^0.23.0"
+
+[tool.pytest.ini_options]
+log_cli = "True"
+log_format = "%(levelname)s %(message)s"
+log_level = "INFO"
+addopts = "-p no:warnings"
+python_files = [
+  "test_generator.py",
+  "test_giver.py",
+]
+markers = [
+  "generate_user",
+  "generate_product",
+  "fetch_all_users",
+  "fetch_product",
+  "fetch_gallery",
+]
+env = [
+  "D:MYSQL_HOST=127.0.0.1",
+  "D:MYSQL_NAME=sample_db",
+  "D:MYSQL_USER=user",
+  "D:MYSQL_PASSWORD=password",
+]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

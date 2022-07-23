@@ -1,61 +1,127 @@
-import os
 import logging
 import zipfile
 
-from fastapi import File, UploadFile, Query
-from sqlalchemy.orm import Session
-from sqlalchemy.sql.expression import func
+from fastapi import HTTPException, status
 from pydantic import UUID4
+from sqlalchemy import select
+from sqlalchemy.orm import selectinload
+from sqlalchemy.sql.expression import func
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db import models
+from app.api.schema.product import Product
 from app.api.module.utility import remove_file
 
 logger = logging.getLogger("genicons")
 
 
-def create(
-    db: Session,
-    relation_id: UUID4,
-    rs_icon: UploadFile = File(...),
-    c_icon: UploadFile = File(...),
+async def create_product(
+    session: AsyncSession,
+    product: Product,
 ) -> bool:
     try:
-        logger.info(f"{__name__}.{create.__name__}")
+        async with session.begin():
+            statement = (
+                select(models.User)
+                .where(models.User.id == product.users_id)
+                .options(selectinload(models.User.products))
+            )
+            user_obj = await session.execute(statement)
+            user = user_obj.scalars().first()
 
-        db_product = models.Product(
-            rounded_square_icon=rs_icon, circle_icon=c_icon, users_id=relation_id
-        )
-        db.add(db_product)
-        db.commit()
+            product_db = models.Product(
+                product_id=product.product_id,
+                origin_img=product.origin_img,
+                rounded_square_icon=None,
+                circle_icon=None,
+            )
+
+            user.products.append(product_db)
+
+        logger.info("New Product: %s", product_db.product_id)
         return True
 
     except Exception as e:
         logger.error(e)
-        return False
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
 
 
-def read_by_uuid(db: Session, uid: UUID4) -> bool:
-    id = str(uid)[:8]
-    handle_jpg = [f"./rs_{id}.jpg", f"./c_{id}.jpg"]
+async def read_product(
+    session: AsyncSession, product_id: UUID4, product_path: str
+) -> bool:
+    handle_jpg = [f"./rs_{product_id}.jpg", f"./c_{product_id}.jpg"]
 
     try:
-        logger.info(f"{__name__}.{read_by_uuid.__name__}")
+        async with session.begin():
+            statement = select(models.Product).where(
+                models.Product.product_id == product_id
+            )
+            user_obj = await session.execute(statement)
+            product = user_obj.scalars().first()
 
-        user_data = (
-            db.query(models.Product).filter(models.Product.users_id == uid).first()
-        )
-        if not user_data:
-            raise Exception("No Products data by its uuid")
+        if not product.rounded_square_icon or product.circle_icon:
+            raise HTTPException(
+                status_code=status.HTTP_204_NO_CONTENT, detail="No Icons yet"
+            )
 
-        # First, make img-files
         with open(handle_jpg[0], "wb") as rs_file:
-            rs_file.write(user_data.rounded_square_icon)
+            rs_file.write(product.rounded_square_icon)
         with open(handle_jpg[1], "wb") as c_file:
-            c_file.write(user_data.circle_icon)
+            c_file.write(product.circle_icon)
 
-        # Second, make zip-file contained img-files
-        with zipfile.ZipFile(f"./{id}.zip", "w") as zipObj:
-            [zipObj.write(jpg) for jpg in handle_jpg]
+        with zipfile.ZipFile(product_path, "w") as zip_file:
+            [zip_file.write(jpg) for jpg in handle_jpg]
+
+        return True
+
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    finally:
+        remove_file(paths=handle_jpg)
+
+
+async def delete_product(session: AsyncSession, product_id: UUID4) -> bool:
+    try:
+        async with session.begin():
+            statement = select(models.Product).where(
+                models.Product.product_id == product_id
+            )
+            product_obj = await session.execute(statement)
+            product = product_obj.scalars().first()
+
+            await session.delete(product)
+
+        return True
+
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+
+async def read_random_products(
+    session: AsyncSession, garally_num: int, garally_path: str
+) -> bool:
+    handle_jpg = [f"./random{i}.jpg" for i in range(1, garally_num + 1)]
+
+    try:
+        async with session.begin():
+            statement = select(models.Product).order_by(func.rand()).limit(garally_num)
+            products_obj = await session.execute(statement)
+            products = products_obj.scalars().all()
+
+        for i, product in enumerate(products):
+            with open(handle_jpg[i], "wb") as random_file:
+                random_file.write(product.rounded_square_icon)
+
+        with zipfile.ZipFile(garally_path, "w") as zipObj:
+            for jpg in handle_jpg:
+                zipObj.write(jpg)
 
         return True
 
@@ -65,106 +131,3 @@ def read_by_uuid(db: Session, uid: UUID4) -> bool:
 
     finally:
         remove_file(paths=handle_jpg)
-
-
-def random_read(db: Session, num: int = Query(..., min_num=1, max_num=12)) -> bool:
-    logger.info(f"{__name__}.{random_read.__name__}")
-
-    available_max = count(db)
-    logger.info(f"Number of products: {available_max}")
-
-    if not available_max:
-        return False
-
-    if num > available_max:
-        num = available_max
-
-    handle_jpg = []
-    for i in range(num):
-        handle_jpg.append([f"./rs_{i+1}.jpg", f"./c_{i+1}.jpg"])
-
-    try:
-        user_datas = db.query(models.Product).order_by(func.rand()).limit(num).all()
-
-        # First, make img-files
-        for i, user_data in enumerate(user_datas):
-            with open(handle_jpg[i][0], "wb") as rs_file:
-                rs_file.write(user_data.rounded_square_icon)
-            with open(handle_jpg[i][1], "wb") as c_file:
-                c_file.write(user_data.circle_icon)
-        logger.info(f"{random_read.__name__} {os.listdir()}")
-
-        # Second, make zip-file contained img-files
-        with zipfile.ZipFile("./gallery.zip", "w") as zipObj:
-            for jpg_paths in handle_jpg:
-                for jpg in jpg_paths:
-                    if os.path.isfile(jpg):
-                        zipObj.write(jpg)
-
-        return True
-
-    except Exception as e:
-        logger.error(e)
-        return False
-
-    finally:
-        for jpg_paths in handle_jpg:
-            remove_file(paths=jpg_paths)
-
-
-"""
-def update_by_id(db: Session, new_product: schemas.Product) -> bool:
-    try:
-        if not new_product.id:
-            raise Exception('must be specify "id"')
-        origin = \
-            db.query(models.Product).filter(models.Product.id == new_product.id).first()
-        origin.rounded_square_icon = new_product.rounded_square_icon
-        origin.circle_icon = new_product.circle_icon
-        db.commit()
-        return True
-    except:
-        return False
-
-def update_by_uuid(db: Session, uuid: UUID4, new_product: schemas.Product) -> bool:
-    try:
-        origin = db.query(models.User).filter(models.User.id == uuid).first()
-        origin.products = [
-                new_product.rounded_square_icon,
-                new_product.circle_icon
-            ]
-        db.commit()
-        return True
-    except:
-        return False
-
-def delete_by_id(db: Session, id: int) -> bool:
-    try:
-        delete_db_product = \
-            db.query(models.Product).filter(models.Product.id == id).first()
-        db.delete(delete_db_product)
-        db.commit()
-        return True
-    except:
-        return False
-
-def delete_by_uuid(db: Session, uuid: UUID4) -> bool:
-    try:
-        delete_db_user = db.query(models.User).filter(models.User.id == uuid).first()
-        db.delete(delete_db_user.products)
-        db.commit()
-        return True
-    except:
-        return False
-"""
-
-
-def count(db: Session) -> int:
-    try:
-        logger.info(f"{__name__}.{count.__name__}")
-
-        return db.query(models.Product).count()
-
-    except Exception as e:
-        logger.error(e)
-        return False

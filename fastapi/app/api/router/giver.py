@@ -1,13 +1,13 @@
 import logging
 
-from fastapi import APIRouter, Depends, Path, BackgroundTasks, status
-from fastapi.responses import FileResponse, JSONResponse
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, Depends, Query, BackgroundTasks
+from fastapi.responses import FileResponse
+from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import UUID4
 
 from app.db.session import get_db
-from app.api.crud.product import read_by_uuid, random_read
-from app.api.crud.user import all_read
+from app.api.crud.product import read_product, read_random_products
+from app.api.crud.user import read_all_users
 from app.api.module.utility import remove_file
 
 logger = logging.getLogger("genicons").getChild("giver")
@@ -15,8 +15,8 @@ logger = logging.getLogger("genicons").getChild("giver")
 router = APIRouter()
 
 
-@router.get("/users/all/read")
-def read_all(session: Session = Depends(get_db)):
+@router.get("/all/users/fetch")
+async def fetch_all_users(session: AsyncSession = Depends(get_db)):
     """
     Return data in user table
 
@@ -25,74 +25,61 @@ def read_all(session: Session = Depends(get_db)):
 
         dict: {id: img_name}
     """
-    logger.info(read_all.__name__)
-
-    return all_read(session)
+    return await read_all_users(session)
 
 
-@router.get("/gallery/{num}/download")
-def get_gallery(
+@router.get("/product/fetch")
+async def fetch_product(
     background: BackgroundTasks,
-    num: int = Path(..., ge=1.0, le=12.0),
-    session: Session = Depends(get_db),
+    product_id: UUID4 = Query(...),
+    session: AsyncSession = Depends(get_db),
+):
+    """
+    Return generated icons
+
+    Args:
+        product_id: UUID4
+
+    Return:
+        products: zip-file (contained two icons)
+    """
+    logger.info(fetch_product.__name__)
+
+    product_path = f"./{product_id}.zip"
+    await read_product(session, product_id, product_path)
+
+    background.add_task(remove_file, path=product_path)
+
+    return FileResponse(
+        product_path,
+        media_type="application/x-zip-compressed",
+        headers={"Content-Disposition": f"attachment; filename={id}.zip"},
+    )
+
+
+@router.get("/gallery/fetch")
+async def fetch_gallery(
+    background: BackgroundTasks,
+    gallery_num: int = Query(9, ge=1.0, le=12.0),
+    session: AsyncSession = Depends(get_db),
 ):
     """
     Return products for gallery
 
     Args:
-        num: int (1 ~ 12)
+        num: query(int)
 
     Return:
         products: zip-file
     """
-    logger.info(get_gallery.__name__)
     gallery_path = "./gallery.zip"
 
-    gallery = random_read(session, num)
+    await read_random_products(session, gallery_num, gallery_path)
 
-    if gallery:
-        background.add_task(remove_file, path=gallery_path)
+    background.add_task(remove_file, path=gallery_path)
 
-        return FileResponse(
-            gallery_path,
-            media_type="application/x-zip-compressed",
-            headers={"Content-Disposition": "attachment; filename=gallery.zip"},
-        )
-    else:
-        return JSONResponse(
-            status_code=status.HTTP_204_NO_CONTENT, content="No Content"
-        )
-
-
-@router.get("/product/{uid}/download")
-def download_products(
-    background: BackgroundTasks, uid: UUID4, session: Session = Depends(get_db)
-):
-    """
-    Return generated rounded squere pic like icon
-
-    Args:
-        uid: UUID
-
-    Return:
-        products: zip-file (contained two icons)
-    """
-    logger.info(download_products.__name__)
-
-    id = str(uid)[:8]
-    product_path = f"./{id}.zip"
-
-    products = read_by_uuid(session, uid)
-
-    if products:
-        background.add_task(remove_file, path=product_path)
-
-        return FileResponse(
-            product_path,
-            media_type="application/x-zip-compressed",
-            headers={"Content-Disposition": f"attachment; filename={id}.zip"},
-        )
-    else:
-        return JSONResponse(
-            status_code=status.HTTP_204_NO_CONTENT, content="Product is empty"
-        )
+    return FileResponse(
+        gallery_path,
+        media_type="application/x-zip-compressed",
+        headers={"Content-Disposition": "attachment; filename=gallery.zip"},
+    )

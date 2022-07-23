@@ -1,9 +1,20 @@
-test_generate_product_schema = {
+schema_generate_user = {
     "type": "object",
-    "required": ["uid"],
+    "required": ["user_id"],
     "additionalProperties": False,
     "properties": {
-        "uid": {
+        "user_id": {
+            "type": "number",
+        }
+    },
+}
+
+schema_generate_product = {
+    "type": "object",
+    "required": ["product_id"],
+    "additionalProperties": False,
+    "properties": {
+        "product_id": {
             "type": "string",
             "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
         }

@@ -16,5 +16,6 @@ DATABASE_URL = config(
     "DATABASE_URL",
     cast=str,
     default=f"mysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}/{MYSQL_NAME}"
-    + "?charset=utf8",
+    + "?charset=utf8mb4",
+    # + "?charset=utf8",
 )

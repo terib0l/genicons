@@ -27,25 +27,3 @@ class Product(Base):
     circle_icon = Column(LargeBinary(length=(2**24)))
 
     users_id = Column(Integer, ForeignKey("users.id"))
-
-
-"""Pre-Models
-class User(Base):
-    __tablename__ = "users"
-
-    id = Column(UUIDType(binary=False), default=uuid4, primary_key=True)
-    img = Column(LargeBinary(length=(2**24)), nullable=False)
-    img_name = Column(String(20), nullable=False)
-
-    products = relationship("Product")
-
-
-class Product(Base):
-    __tablename__ = "products"
-
-    id = Column(Integer, primary_key=True)
-    rounded_square_icon = Column(LargeBinary(length=(2**24)))
-    circle_icon = Column(LargeBinary(length=(2**24)))
-
-    users_id = Column(UUIDType(binary=False), ForeignKey("users.id"), default=uuid4)
-"""

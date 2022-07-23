@@ -6,13 +6,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.base import api_router
-from app.db.session import Base, ENGINE
 from app.core.config import PROJECT_NAME, VERSION, DEBUG
 
 logger = logging.getLogger("genicons")
-
-Base.metadata.drop_all(ENGINE)
-Base.metadata.create_all(bind=ENGINE, checkfirst=False)
+logger.info("http://localhost:8888/docs")
 
 app = FastAPI(title=PROJECT_NAME, version=VERSION, debug=DEBUG)
 app.add_middleware(
@@ -31,8 +28,6 @@ def startup_event():
 
 
 if __name__ == "__main__":
-    logger.info("host=0.0.0.0, port=8888")
-
     uvicorn.run(
         "main:app",
         host="0.0.0.0",
