@@ -37,7 +37,7 @@ async def create_user(session: AsyncSession, user: User) -> int:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-async def read_all_users(session: AsyncSession):
+async def read_all_users(session: AsyncSession) -> list:
     try:
         async with session.begin():
             statement = select(models.User)
@@ -51,15 +51,13 @@ async def read_all_users(session: AsyncSession):
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-async def read_product_ids(
-    session: AsyncSession, name: str, email: EmailStr
-) -> List[UUID4]:
+async def read_product_ids(session: AsyncSession, user_id: int) -> List[UUID4]:
     product_ids = list()
     try:
         async with session.begin():
             statement = (
                 select(models.User)
-                .where(models.User.name == name, models.User.email == email)
+                .where(models.User.id == user_id)
                 .options(selectinload(models.User.products))
             )
             user_obj = await session.execute(statement)
@@ -78,12 +76,12 @@ async def read_product_ids(
 
 
 async def update_user_email(
-    session: AsyncSession, name: str, new_email: EmailStr
+    session: AsyncSession, user_id: int, new_email: EmailStr
 ) -> bool:
     try:
         async with session.begin():
             statement = select(models.User).where(
-                models.User.name == name,
+                models.User.id == user_id,
             )
             user_obj = await session.execute(statement)
             user = user_obj.scalars().first()
@@ -102,12 +100,12 @@ async def update_user_email(
         )
 
 
-async def delete_user(session: AsyncSession, name: str, email: EmailStr) -> bool:
+async def delete_user_by_id(session: AsyncSession, user_id: int) -> bool:
     try:
         async with session.begin():
             statement = (
                 select(models.User)
-                .where(models.User.name == name, models.User.email == email)
+                .where(models.User.id == user_id)
                 .options(selectinload(models.User.products))
             )
             user_obj = await session.execute(statement)

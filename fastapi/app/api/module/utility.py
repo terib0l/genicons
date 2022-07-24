@@ -5,7 +5,6 @@ logger = logging.getLogger("genicons").getChild("utility")
 
 
 def remove_file(path: str = None, paths: list = None):
-    logger.info(remove_file.__name__)
     if path:
         logger.debug(f"{remove_file.__name__}, {path}")
         if os.path.isfile(path):

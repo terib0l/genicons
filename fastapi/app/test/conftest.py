@@ -1,14 +1,20 @@
 import os
 import re
 import random
+import uuid
+import asyncio
 import pytest
 import pytest_asyncio
+from typing import Generator
 from faker import Faker
 from pathlib import Path
 from dataclasses import dataclass
+from sqlalchemy import select
+from sqlalchemy.orm import sessionmaker, selectinload
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker
+from httpx import AsyncClient
 
+from main import app
 from app.core.config import DATABASE_URL
 from app.db.session import Base
 from app.db import models
@@ -18,6 +24,28 @@ CURRENT_PATH = Path(__file__).resolve().parent
 FAKE = Faker()
 
 SQLALCHEMY_DATABASE_URL = re.sub("mysql", "mysql+aiomysql", DATABASE_URL)
+
+PRODUCT_IDS = [
+    uuid.uuid4(),
+    uuid.uuid4(),
+    uuid.uuid4(),
+]
+
+
+@pytest.fixture(scope="session")
+def event_loop() -> Generator:
+    """
+    Create an instance of the default event loop for each test case.
+    """
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
+
+
+@pytest_asyncio.fixture(scope="function")
+async def async_client():
+    async with AsyncClient(app=app, base_url="http://127.0.0.1:8888/") as client:
+        yield client
 
 
 @pytest_asyncio.fixture(scope="function", autouse=True)
@@ -33,6 +61,7 @@ async def async_session():
     )
     async with async_session() as session:
         async with session.begin():
+            # Registration init-users
             session.add_all(
                 [
                     models.User(name=FAKE.name(), email=FAKE.email(), premium=False),
@@ -41,9 +70,29 @@ async def async_session():
                 ]
             )
 
-    await engine.dispose()
+            # Registration init-products
+            names = os.listdir(str(Path(CURRENT_PATH, "img/")))
+            for i, name in enumerate(names, start=1):
+                path = str(Path(CURRENT_PATH, "img/", name))
 
-    yield
+                statement = (
+                    select(models.User)
+                    .where(models.User.id == i)
+                    .options(selectinload(models.User.products))
+                )
+                user_obj = await session.execute(statement)
+                user = user_obj.scalars().first()
+
+                user.products.append(
+                    models.Product(
+                        product_id=PRODUCT_IDS[i - 1],
+                        origin_img=open(path, "rb").read(),
+                        circle_icon=open(path, "rb").read(),
+                        rounded_square_icon=open(path, "rb").read(),
+                    )
+                )
+
+    await engine.dispose()
 
 
 @dataclass
@@ -68,3 +117,8 @@ def random_user():
         "name": FAKE.name(),
         "email": FAKE.email(),
     }
+
+
+@pytest.fixture(scope="function")
+def product_id():
+    return random.choice(PRODUCT_IDS)

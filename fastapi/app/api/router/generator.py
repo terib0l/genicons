@@ -1,6 +1,7 @@
-import uuid
 import logging
-
+from uuid import uuid4
+from pydantic import EmailStr
+from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import (
     APIRouter,
     BackgroundTasks,
@@ -8,17 +9,14 @@ from fastapi import (
     Depends,
     Query,
 )
-from sqlalchemy.ext.asyncio import AsyncSession
-from pydantic import EmailStr
 
 from app.db.session import get_db
-
-# from app.api.module.ml_caller import caller
-from app.api.module.dependency import ValidateUploadFile, FileTypeName
 from app.api.schema.product import Product
 from app.api.schema.user import User
 from app.api.crud.product import create_product
 from app.api.crud.user import create_user
+from app.api.module.dependency import ValidateUploadFile, FileTypeName
+from app.api.module.genicon_caller import caller
 
 logger = logging.getLogger("genicons").getChild("generator")
 
@@ -32,7 +30,7 @@ validate_upload_file = ValidateUploadFile(
 )
 
 
-@router.post("/user/generate")
+@router.post("/generate/user")
 async def generate_user(
     name: str = Query(...),
     email: EmailStr = Query(...),
@@ -47,15 +45,16 @@ async def generate_user(
         email: query(EmailStr)
 
     Return:
-    """
-    logger.info(generate_user.__name__)
 
+        user_id: int
+    """
     id = await create_user(session, User(name=name, email=email))
 
+    logger.info("generate_user() created new user_id: %s", id)
     return {"user_id": id}
 
 
-@router.post("/product/generate")
+@router.post("/generate/product")
 async def generate_product(
     background: BackgroundTasks,
     user_id: int = Query(...),
@@ -72,11 +71,9 @@ async def generate_product(
 
     Return:
 
-        product_id: UUID4
+        product_id: uuid4
     """
-    logger.info(generate_product.__name__)
-
-    product_id = uuid.uuid4()
+    product_id = uuid4()
 
     with img.file as data:
         await create_product(
@@ -90,6 +87,7 @@ async def generate_product(
             ),
         )
 
-    # background.add_task(caller, product_id, session)
+    background.add_task(caller, session, product_id)
 
+    logger.info("generate_product() created new product: %s", product_id)
     return {"product_id": product_id}

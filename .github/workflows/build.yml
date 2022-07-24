@@ -52,7 +52,7 @@ jobs:
         run: |
           cd fastapi/
           poetry install --no-interaction
-          poetry run pytest --rootdir=./app/test/ -c ./app/test/pytest.ini
+          poetry run pytest -s -v
 
   sast:
     needs: build

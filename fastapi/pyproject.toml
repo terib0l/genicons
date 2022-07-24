@@ -41,7 +41,7 @@ python_files = [
 markers = [
   "generate_user",
   "generate_product",
-  "fetch_all_users",
+  "fetch_product_ids",
   "fetch_product",
   "fetch_gallery",
 ]

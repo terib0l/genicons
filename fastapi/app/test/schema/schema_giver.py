@@ -1,13 +1,16 @@
-schema_fetch_all_users = {
+schema_fetch_product_ids = {
     "type": "array",
     "items": {
-        "type": "object",
-        "properties": {
-            "id": {"type": "number"},
-            "name": {"type": "string"},
-            "email": {"type": "string", "format": "email"},
-            "premium": {"type": "boolean"},
-        },
+        "type": "string",
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+    },
+}
+
+schema_fetch_product = {
+    "type": "array",
+    "items": {
+        "type": "string",
+        "pattern": "^(rs|c)_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.jpg$",
     },
 }
 
@@ -17,7 +20,7 @@ schema_fetch_product_headers = {
     "properties": {
         "content-disposition": {
             "type": "string",
-            "pattern": "^attachment; filename=[0-9a-f]{8}\\.zip$",
+            "pattern": "^attachment; filename=[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.zip$",
         },
         "content-type": {"type": "string", "pattern": "^application/x-zip-compressed$"},
         "content-length": {"type": "string", "pattern": "[0-9]*"},
@@ -28,7 +31,7 @@ schema_fetch_product_headers = {
 
 schema_fetch_gallery = {
     "type": "array",
-    "items": {"type": "string", "pattern": "^(rs|c)_([1-9]|1[0-2])\\.(jpg|jpeg)"},
+    "items": {"type": "string", "pattern": "^random(\\d)+\\.jpg"},
 }
 
 schema_fetch_gallery_headers = {

@@ -1,3 +1,4 @@
+import os
 import logging
 import zipfile
 
@@ -61,10 +62,8 @@ async def read_product(
             user_obj = await session.execute(statement)
             product = user_obj.scalars().first()
 
-        if not product.rounded_square_icon or product.circle_icon:
-            raise HTTPException(
-                status_code=status.HTTP_204_NO_CONTENT, detail="No Icons yet"
-            )
+        if not product.rounded_square_icon or not product.circle_icon:
+            return False
 
         with open(handle_jpg[0], "wb") as rs_file:
             rs_file.write(product.rounded_square_icon)
@@ -84,7 +83,9 @@ async def read_product(
         remove_file(paths=handle_jpg)
 
 
-async def delete_product(session: AsyncSession, product_id: UUID4) -> bool:
+async def delete_product_by_product_id(
+    session: AsyncSession, product_id: UUID4
+) -> bool:
     try:
         async with session.begin():
             statement = select(models.Product).where(
@@ -111,17 +112,25 @@ async def read_random_products(
 
     try:
         async with session.begin():
-            statement = select(models.Product).order_by(func.rand()).limit(garally_num)
+            statement = (
+                select(
+                    models.Product.rounded_square_icon,
+                    models.Product.circle_icon,
+                )
+                .order_by(func.rand())
+                .limit(garally_num)
+            )
             products_obj = await session.execute(statement)
             products = products_obj.scalars().all()
 
         for i, product in enumerate(products):
-            with open(handle_jpg[i], "wb") as random_file:
-                random_file.write(product.rounded_square_icon)
+            with open(handle_jpg[i], "wb") as jpg:
+                jpg.write(product)
 
         with zipfile.ZipFile(garally_path, "w") as zipObj:
             for jpg in handle_jpg:
-                zipObj.write(jpg)
+                if os.path.isfile(jpg):
+                    zipObj.write(jpg)
 
         return True
 

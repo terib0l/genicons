@@ -12,7 +12,7 @@ Base = declarative_base()
 ENGINE = create_async_engine(
     SQLALCHEMY_DATABASE_URL,
     encoding="utf-8",
-    echo=True,
+    echo=False,
 )
 async_session = sessionmaker(
     autocommit=False,
