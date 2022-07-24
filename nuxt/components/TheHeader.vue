@@ -9,9 +9,6 @@
       <NuxtLink to="/" class="inline-block text-base px-4 py-2 leading-none text-white bg-emerald-500 hover:border-transparent hover:text-white hover:bg-gray-900 mt-4 mr-2 lg:mt-0">
         HOME
       </NuxtLink>
-      <NuxtLink to="/entries" class="inline-block text-base px-4 py-2 leading-none text-white bg-emerald-500 hover:border-transparent hover:text-white hover:bg-gray-900 mt-4 mr-2 lg:mt-0">
-        Entries
-      </NuxtLink>
       <NuxtLink to="/form" class="inline-block text-base px-4 py-2 leading-none text-white bg-emerald-500 hover:border-transparent hover:text-white hover:bg-gray-900 mt-4 lg:mt-0">
         Contact Form
       </NuxtLink>

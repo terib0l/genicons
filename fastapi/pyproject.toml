@@ -45,12 +45,6 @@ markers = [
   "fetch_product",
   "fetch_gallery",
 ]
-env = [
-  "D:MYSQL_HOST=127.0.0.1",
-  "D:MYSQL_NAME=sample_db",
-  "D:MYSQL_USER=user",
-  "D:MYSQL_PASSWORD=password",
-]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
