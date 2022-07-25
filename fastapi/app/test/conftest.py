@@ -23,11 +23,9 @@ CURRENT_PATH = Path(__file__).resolve().parent
 
 FAKE = Faker()
 
-SQLALCHEMY_DATABASE_URL = re.sub("mysql", "mysql+aiomysql", DATABASE_URL)
+#SQLALCHEMY_DATABASE_URL = re.sub("mysql", "mysql+aiomysql", DATABASE_URL)
+SQLALCHEMY_DATABASE_URL = DATABASE_URL
 print("#" * 30)
-from app.core.config import DATABASE_URL
-
-print(DATABASE_URL)
 print(SQLALCHEMY_DATABASE_URL)
 print("#" * 30)
 
