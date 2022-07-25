@@ -52,66 +52,66 @@ jobs:
         run: |
           cd fastapi/
           poetry install --no-interaction
-          poetry run pytest -s -v
+          poetry run pytest -v -m generate_user
         env:
-          MYSQL_HOST: localhost
+          MYSQL_HOST: 127.0.0.1
           MYSQL_NAME: sample_db
           MYSQL_USER: user
-          MYSQL_PASSWORD: password
+          MYSQL_PASSWORD: password # pragma: allowlist secret
 
-  sast:
-    needs: build
-    runs-on: ubuntu-latest
+          #  sast:
+          #    needs: build
+          #    runs-on: ubuntu-latest
 
-    steps:
-
-      - name: Check out repository code
-        uses: actions/checkout@v2
-
-      ## SAST (and dependency, infla-code, container-image)
-      - name: Build an image from Dockerfile
-        run: |
-          cd fastapi/
-          docker build -t tribol/genicons-api:${{ github.sha }} .
-
-      - name: Run Trivy container scanner
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: 'tribol/genicons-api:${{ github.sha }}'
-          format: 'sarif'
-          exit-code: '0'
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'HIGH,CRITICAL'
-          output: 'trivy-container-scan-results.sarif'
-
-      - name: Run Trivy repo-contents scan
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'fs'
-          format: 'sarif'
-          exit-code: '0'
-          ignore-unfixed: true
-          severity: 'HIGH,CRITICAL'
-          output: 'trivy-repo-scan-results.sarif'
-
-      - name: Run Trivy config scan
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'config'
-          hide-progress: false
-          format: 'table'
-          exit-code: '0'
-          ignore-unfixed: true
-          severity: 'HIGH,CRITICAL'
-
-      - name: Bundle Trivy analysis report
-        if: always()
-        run: |
-          mkdir sarif && find . -name '*.sarif' | xargs -I{} cp "{}" ./sarif/
-
-      - name: Upload Trivy container scan results to GitHub Security tab
-        if: always()
-        uses: github/codeql-action/upload-sarif@v1
-        with:
-          sarif_file: sarif
+          #    steps:
+          #
+          #      - name: Check out repository code
+          #        uses: actions/checkout@v2
+          #
+          #      ## SAST (and dependency, infla-code, container-image)
+          #      - name: Build an image from Dockerfile
+          #        run: |
+          #          cd fastapi/
+          #          docker build -t tribol/genicons-api:${{ github.sha }} .
+          #
+          #      - name: Run Trivy container scanner
+          #        uses: aquasecurity/trivy-action@master
+          #        with:
+          #          image-ref: 'tribol/genicons-api:${{ github.sha }}'
+          #          format: 'sarif'
+          #          exit-code: '0'
+          #          ignore-unfixed: true
+          #          vuln-type: 'os,library'
+          #          severity: 'HIGH,CRITICAL'
+          #          output: 'trivy-container-scan-results.sarif'
+          #
+          #      - name: Run Trivy repo-contents scan
+          #        uses: aquasecurity/trivy-action@master
+          #        with:
+          #          scan-type: 'fs'
+          #          format: 'sarif'
+          #          exit-code: '0'
+          #          ignore-unfixed: true
+          #          severity: 'HIGH,CRITICAL'
+          #          output: 'trivy-repo-scan-results.sarif'
+          #
+          #      - name: Run Trivy config scan
+          #        uses: aquasecurity/trivy-action@master
+          #        with:
+          #          scan-type: 'config'
+          #          hide-progress: false
+          #          format: 'table'
+          #          exit-code: '0'
+          #          ignore-unfixed: true
+          #          severity: 'HIGH,CRITICAL'
+          #
+          #      - name: Bundle Trivy analysis report
+          #        if: always()
+          #        run: |
+          #          mkdir sarif && find . -name '*.sarif' | xargs -I{} cp "{}" ./sarif/
+          #
+          #      - name: Upload Trivy container scan results to GitHub Security tab
+          #        if: always()
+          #        uses: github/codeql-action/upload-sarif@v1
+          #        with:
+          #          sarif_file: sarif
