@@ -15,7 +15,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from httpx import AsyncClient
 
 from main import app
-from app.core.config import DATABASE_URL
+from app.core.config import MYSQL_USER, MYSQL_PASSWORD, MYSQL_HOST, MYSQL_NAME
 from app.db.session import Base
 from app.db import models
 
@@ -23,8 +23,8 @@ CURRENT_PATH = Path(__file__).resolve().parent
 
 FAKE = Faker()
 
-#SQLALCHEMY_DATABASE_URL = re.sub("mysql", "mysql+aiomysql", DATABASE_URL)
-SQLALCHEMY_DATABASE_URL = DATABASE_URL
+SQLALCHEMY_DATABASE_URL = f"mysql+aiomysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}/{MYSQL_NAME}?charset=utf8mb4"
+
 print("#" * 30)
 print(SQLALCHEMY_DATABASE_URL)
 print("#" * 30)
