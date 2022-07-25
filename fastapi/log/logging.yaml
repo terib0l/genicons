@@ -16,4 +16,4 @@ loggers:
   genicons:
     level: DEBUG
     handlers: [console]
-    propagate: no
+    propagate: yes

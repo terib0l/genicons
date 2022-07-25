@@ -14,7 +14,8 @@ logger.info("http://localhost:8888/docs")
 app = FastAPI(title=PROJECT_NAME, version=VERSION, debug=DEBUG)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://nuxt:3000"],
+    # allow_origins=["http://nuxt:3000"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -25,6 +26,11 @@ app.include_router(api_router)
 @app.on_event("startup")
 def startup_event():
     pass
+
+
+@app.get("/")
+def index():
+    return "success"
 
 
 if __name__ == "__main__":

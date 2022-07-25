@@ -19,7 +19,4 @@ module.exports = {
     require('daisyui'),
   ],
   // https://daisyui.com/docs/config/
-  daisyui: {
-    themes: ["halloween", "forest"],
-  }
 };

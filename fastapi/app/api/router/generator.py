@@ -73,6 +73,7 @@ async def generate_product(
 
         product_id: uuid4
     """
+    logger.info("generate_product be acessed!!")
     product_id = uuid4()
 
     with img.file as data:

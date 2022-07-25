@@ -5,6 +5,7 @@ from fastapi import (
     APIRouter,
     Depends,
     Query,
+    Form,
 )
 
 from app.db.session import get_db
@@ -114,3 +115,8 @@ async def delete_user(
     await delete_user_by_id(session=session, user_id=user_id)
 
     return {"user_id": user_id}
+
+
+@router.post("/send/contact")
+def send_contact(contents: str = Form(...)):
+    pass

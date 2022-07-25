@@ -1,8 +1,22 @@
 <script setup lang="ts">
-// data
-// const { data } = await useFetch(() => "https://jsonplaceholder.typicode.com/users");
-// const users: Array<object> = data._rawValue;
+// import JSZip from 'jszip';
+// import JSZipUtils from 'jszip-utils';
 
+// import AssetsImage from '@/assets/images/c_81940681-204c-47a2-9eb0-2e4b516edb3d.jpg';
+
+let image: Blob = null;
+const productId = ref<string>('');
+const initGallery = async () => {
+  const options = {
+    method: 'GET',
+    params: { num: 6 },
+    baseURL: 'http://localhost:8888'
+  };
+
+  const { data } = await useLazyAsyncData('gallery', () => $fetch('/fetch/gallery', options));
+
+  // const urls: Array<string> = 
+}
 const urls: Array<string> = [
   "https://mdbcdn.b-cdn.net/img/Photos/Horizontal/Nature/4-col/img%20(73).webp",
   "https://mdbcdn.b-cdn.net/img/Photos/Horizontal/Nature/4-col/img%20(74).webp",
@@ -11,23 +25,48 @@ const urls: Array<string> = [
   "https://mdbcdn.b-cdn.net/img/Photos/Horizontal/Nature/4-col/img%20(76).webp",
   "https://mdbcdn.b-cdn.net/img/Photos/Horizontal/Nature/4-col/img%20(72).webp",
 ]
-let img: File | null = null
 
-const onImageUploaded = (event: any) => {
-  img = event.target.files[0];
+const uploadImage = (event: any) => {
+  image = event.target.files[0];
 }
 
-const createProduct = () => {
-  if(img == null) {
-    console.log("There is nothing.");
+const generateProduct = async () => {
+  if(image) {
+    const bodyImg = new FormData();
+    bodyImg.append('img', image);
+
+    const options = {
+      method: 'POST',
+      body: bodyImg,
+      params: { user_id: 2 },
+      baseURL: 'http://localhost:8888'
+    };
+
+    const { data } = await useAsyncData('generate', () => $fetch('/generate/product', options));
+
+    productId.value = data._rawValue.product_id;
+
+    const productDialog = document.getElementById('productDialog');
+    productDialog.showModal();
   } else {
-    console.log("There is a img"); // request Web API
+    alert("Please set JPG!!");
   }
 }
 </script>
 
 <template>
   <div class="w-fit mx-auto">
+    <dialog id="productDialog" class="bg-gray-300 rounded">
+      <div class="p-3">
+        <a class="text-lg font-bold text-slate-800">Your Product ID:&nbsp;&nbsp;</a>
+        <a class="text-xl font-bold text-violet-700">{{ productId }}</a>
+      </div>
+      <menu class="flex justify-center">
+        <button class="bg-transparent hover:bg-slate-600 text-slate-800 font-semibold hover:text-white py-2 px-4 border border-slate-600 hover:border-transparent rounded" onclick="document.getElementById('productDialog').close()">
+          Confirm
+        </button>
+      </menu>
+    </dialog>
     <h1 class="font-bold italic text-4xl text-gray-300 m-10 p-10">
       Welcome to Genicons!!
     </h1>
@@ -37,7 +76,7 @@ const createProduct = () => {
       </div>
       <label class="block">
         <span class="sr-only">Choose profile photo</span>
-        <input type="file" @change="onImageUploaded" class="block w-full text-sm text-slate-500
+        <input type="file" @change="uploadImage" class="block w-full text-sm text-slate-500
           file:mr-4 file:py-2 file:px-4
           file:rounded-full file:border-0
           file:text-sm file:font-semibold
@@ -48,7 +87,7 @@ const createProduct = () => {
     </form>
     <div class="flex space-x-2 justify-center">
       <div>
-        <button type="button" @click="createProduct" class="inline-block px-6 py-2 border-2 border-emerald-500 text-emerald-500 font-medium text-xs leading-tight uppercase rounded hover:bg-black hover:bg-opacity-5 focus:outline-none focus:ring-0 transition duration-150 ease-in-out">
+        <button type="button" @click="generateProduct" class="inline-block px-6 py-2 border-2 border-emerald-500 text-emerald-500 font-medium text-sm leading-tight uppercase rounded hover:bg-black hover:bg-opacity-5 focus:outline-none focus:ring-0 transition duration-150 ease-in-out">
           Let's create!!
         </button>
       </div>

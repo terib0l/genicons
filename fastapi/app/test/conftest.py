@@ -24,9 +24,6 @@ CURRENT_PATH = Path(__file__).resolve().parent
 FAKE = Faker()
 
 SQLALCHEMY_DATABASE_URL = re.sub("mysql", "mysql+aiomysql", DATABASE_URL)
-print("#" * 30)
-print(SQLALCHEMY_DATABASE_URL)
-print("#" * 30)
 
 PRODUCT_IDS = [
     uuid.uuid4(),
