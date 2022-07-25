@@ -10,7 +10,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        python-version: [3.8]
+        python-version: [3.9.5]
         poetry-version: [1.1.12]
         
     runs-on: ${{ matrix.os }}
@@ -53,6 +53,11 @@ jobs:
           cd fastapi/
           poetry install --no-interaction
           poetry run pytest -s -v
+        env:
+          MYSQL_HOST: localhost
+          MYSQL_NAME: sample_db
+          MYSQL_USER: user
+          MYSQL_PASSWORD: password
 
   sast:
     needs: build
