@@ -45,6 +45,13 @@ markers = [
   "fetch_product",
   "fetch_gallery",
 ]
+env = [
+  "MYSQL_DATABASE = sample_db",
+  "MYSQL_USER = user",
+  "MYSQL_PASSWORD = password", # pragma: allowlist secret
+  "MYSQL_ROOT_PASSWORD = password", # pragma: allowlist secret
+  "MYSQL_HOST = 127.0.0.1",
+]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

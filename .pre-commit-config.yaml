@@ -14,4 +14,4 @@ repos:
     rev: v1.2.0
     hooks:
       - id: detect-secrets
-        args: ['--exclude-lines', 'D:MYSQL_PASSWORD=.*$', '--exclude-lines', '^(down_)?revision.*$']
+        args: ['--exclude-lines', 'D:MYSQL_PASSWORD=.*$', '--exclude-lines', '^(down_)?revision.*$', '--exclude-lines', '']

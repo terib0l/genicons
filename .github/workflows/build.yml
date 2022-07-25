@@ -54,8 +54,6 @@ jobs:
           cd fastapi/
           poetry install --no-interaction
           poetry run pytest -v -m generate_user
-        env:
-          DATABASE_URL: mysql://user:password@127.0.0.1/sample_db?charset=utf8mb4 # pragma: allowlist secret
 
           #  sast:
           #    needs: build
