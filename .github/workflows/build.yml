@@ -2,7 +2,7 @@ name: Genicons CI build
 
 on:
   push:
-    branches: [main]
+    branches: [main, ci-tester]
 
 jobs:
   build:
