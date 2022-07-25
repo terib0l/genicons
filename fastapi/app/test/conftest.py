@@ -1,5 +1,4 @@
 import os
-import re
 import random
 import uuid
 import asyncio
@@ -15,15 +14,15 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from httpx import AsyncClient
 
 from main import app
-from app.core.config import DATABASE_URL
-from app.db.session import Base
 from app.db import models
+from app.db.session import Base
+from app.core.config import MYSQL_HOST, MYSQL_NAME, MYSQL_USER, MYSQL_PASSWORD
 
 CURRENT_PATH = Path(__file__).resolve().parent
 
 FAKE = Faker()
 
-SQLALCHEMY_DATABASE_URL = re.sub("mysql", "mysql+aiomysql", DATABASE_URL)
+SQLALCHEMY_DATABASE_URL = f"mysql+aiomysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}/{MYSQL_NAME}?charset=utf8mb4"  # noqa: E501
 
 PRODUCT_IDS = [
     uuid.uuid4(),

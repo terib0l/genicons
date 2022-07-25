@@ -1,11 +1,12 @@
 import logging
 import uvicorn
 from pathlib import Path
-
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.base import api_router
+from app.db.session import get_db
 from app.core.config import PROJECT_NAME, VERSION, DEBUG
 
 logger = logging.getLogger("genicons")
@@ -24,12 +25,20 @@ app.include_router(api_router)
 
 
 @app.on_event("startup")
-def startup_event():
+async def startup_event():
     pass
 
 
 @app.get("/")
-def index():
+async def index(
+    session: AsyncSession = Depends(get_db),
+):
+    async with session.begin():
+        statement = "show databases;"
+        info_obj = await session.execute(statement)
+        info = info_obj.scalars().all()
+        logger.info(info)
+
     return "success"
 
 

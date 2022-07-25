@@ -11,11 +11,3 @@ MYSQL_HOST = config("MYSQL_HOST", cast=str, default="127.0.0.1")
 MYSQL_NAME = config("MYSQL_NAME", cast=str, default="sample_db")
 MYSQL_USER = config("MYSQL_USER", cast=str, default="user")
 MYSQL_PASSWORD = config("MYSQL_PASSWORD", cast=Secret, default="password")
-
-DATABASE_URL = config(
-    "DATABASE_URL",
-    cast=str,
-    default=f"mysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}/{MYSQL_NAME}"
-    + "?charset=utf8mb4",
-    # + "?charset=utf8",
-)

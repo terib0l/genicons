@@ -2,7 +2,7 @@ name: Genicons CI build
 
 on:
   push:
-    branches: [main, ci-tester]
+    branches: [main]
 
 jobs:
   build:
@@ -12,12 +12,13 @@ jobs:
         os: [ubuntu-latest]
         python-version: [3.9.5]
         poetry-version: [1.1.12]
+        mysql-version: [5.7]
         
     runs-on: ${{ matrix.os }}
     
     services:
       db:
-        image: mysql:8.0
+        image: mysql:${{ matrix.mysql-version }}
         env:
           MYSQL_DATABASE: sample_db
           MYSQL_USER: user
@@ -52,12 +53,9 @@ jobs:
         run: |
           cd fastapi/
           poetry install --no-interaction
-          poetry run pytest -s -v
+          poetry run pytest -v
         env:
-          MYSQL_HOST: localhost
-          MYSQL_NAME: sample_db
-          MYSQL_USER: user
-          MYSQL_PASSWORD: password
+          MYSQL_HOST: mysql
 
   sast:
     needs: build
