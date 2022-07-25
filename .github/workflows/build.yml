@@ -54,8 +54,6 @@ jobs:
           cd fastapi/
           poetry install --no-interaction
           poetry run pytest -v -m generate_user
-        env:
-          MYSQL_HOST: mysql
 
           #  sast:
           #    needs: build
