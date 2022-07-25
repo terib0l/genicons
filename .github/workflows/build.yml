@@ -12,12 +12,13 @@ jobs:
         os: [ubuntu-latest]
         python-version: [3.9.5]
         poetry-version: [1.1.12]
+        mysql-version: [8.0]
         
     runs-on: ${{ matrix.os }}
     
     services:
       db:
-        image: mysql:8.0
+        image: mysql:${{ matrix.mysql-version }}
         env:
           MYSQL_DATABASE: sample_db
           MYSQL_USER: user
