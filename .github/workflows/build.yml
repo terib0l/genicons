@@ -54,7 +54,7 @@ jobs:
           poetry install --no-interaction
           poetry run pytest -s -v
         env:
-          MYSQL_HOST: mysql  # localhost / 127.0.0.1
+          MYSQL_HOST: localhost
           MYSQL_NAME: sample_db
           MYSQL_USER: user
           MYSQL_PASSWORD: password
