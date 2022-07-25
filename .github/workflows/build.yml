@@ -60,10 +60,7 @@ jobs:
           poetry install --no-interaction
           poetry run pytest -v -m generate_user
         env:
-          MYSQL_HOST: 127.0.0.1
-          MYSQL_NAME: sample_db
-          MYSQL_USER: user
-          MYSQL_PASSWORD: password # pragma: allowlist secret
+          DATABASE_URL: mysql+aiomysql://user:password@127.0.0.1/sample_db?charset=utf8mb4 # pragma: allowlist secret
 
           #  sast:
           #    needs: build
