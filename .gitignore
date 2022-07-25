@@ -3,3 +3,4 @@ __pycache__/
 index.py
 ./fastapi/app/alembic/versions/*.py
 .pytest_cache/
+nuxt/assets/images/test.zip
