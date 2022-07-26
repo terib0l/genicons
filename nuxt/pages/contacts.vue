@@ -7,18 +7,23 @@ const contents = ref('');
 // methods
 const sendText = async () => {
   if (contents) {
-    const res: boolean = window.confirm(`${contents.value}\n\nこの内容で送信しますか？`);
+    const res: boolean = window.confirm(
+      `${contents.value}\n\nこの内容で送信しますか？`
+    );
 
     if (res) {
       const options = {
         method: 'POST',
         body: { contents: contents },
-        baseURL: 'http://localhost:8888'
+        baseURL: useRuntimeConfig().baseUrl
       }
 
-      const { data } = await useAsyncData('contact', () => $fetch('/send/contact', options));
+      const { data } = await useAsyncData(
+        'contact',
+        () => $fetch('/send/contact', options)
+      );
 
-      alert(contents.value);
+      alert(data.value);
     }
   } else {
     alert("Please type your consern!!");
@@ -29,7 +34,9 @@ const sendText = async () => {
 
 <template>
   <div class="flex flex-col w-fit mx-auto justify-center">
-    <h1 class="font-bold italic text-center text-4xl text-gray-300 m-10 p-10">Contact Form</h1>
+    <h1 class="font-bold italic text-center text-4xl text-gray-300 m-10 p-10">
+      Contact Form
+    </h1>
     <div class="py-2 px-4 rounded-t-lg">
       <textarea class="textarea textarea-success" v-model="contents" rows="7" cols="70" placeholder="Type requirements ..."></textarea>
     </div>

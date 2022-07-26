@@ -63,6 +63,9 @@ async def read_product_ids(session: AsyncSession, user_id: int) -> List[UUID4]:
             user_obj = await session.execute(statement)
             user = user_obj.scalars().first()
 
+        if not user:
+            raise Exception("This user hasn't products!!")
+
         for product in user.products:
             product_ids.append(product.product_id)
 

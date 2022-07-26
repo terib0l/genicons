@@ -1,53 +1,61 @@
 <script setup lang="ts">
-// import JSZip from 'jszip';
-// import JSZipUtils from 'jszip-utils';
+import JSZip from "jszip";
 
-// import AssetsImage from '@/assets/images/c_81940681-204c-47a2-9eb0-2e4b516edb3d.jpg';
+const loading = ref<boolean>(false);
 
-let image: Blob = null;
+const file = ref<Blob>();
 const productId = ref<string>('');
-const initGallery = async () => {
+
+const gallerys = ref<Array<string>>([]);
+
+(async () => {
   const options = {
     method: 'GET',
-    params: { num: 6 },
-    baseURL: 'http://localhost:8888'
+    params: {
+      gallery_num: 6
+    },
+    baseURL: useRuntimeConfig().baseUrl,
   };
 
-  const { data } = await useLazyAsyncData('gallery', () => $fetch('/fetch/gallery', options));
+  const { data, pending } = await useLazyAsyncData(
+    'gallery',
+    () => $fetch('/fetch/gallery', options)
+  )
+  JSZip.loadAsync(data.value).then(function(zipData){
 
-  // const urls: Array<string> = 
-}
-const urls: Array<string> = [
-  "https://mdbcdn.b-cdn.net/img/Photos/Horizontal/Nature/4-col/img%20(73).webp",
-  "https://mdbcdn.b-cdn.net/img/Photos/Horizontal/Nature/4-col/img%20(74).webp",
-  "https://mdbcdn.b-cdn.net/img/Photos/Horizontal/Nature/4-col/img%20(75).webp",
-  "https://mdbcdn.b-cdn.net/img/Photos/Horizontal/Nature/4-col/img%20(70).webp",
-  "https://mdbcdn.b-cdn.net/img/Photos/Horizontal/Nature/4-col/img%20(76).webp",
-  "https://mdbcdn.b-cdn.net/img/Photos/Horizontal/Nature/4-col/img%20(72).webp",
-]
+    Object.values(zipData.files).forEach(function (value) {
+      gallerys.value.push(URL.createObjectURL(new Blob([value._data.compressedContent])));
+    });
 
-const uploadImage = (event: any) => {
-  image = event.target.files[0];
+    loading.value = true;
+  });
+})();
+
+const uploadImage = ( event: any ) => {
+  file.value = event.target.files[0];
 }
 
 const generateProduct = async () => {
-  if(image) {
-    const bodyImg = new FormData();
-    bodyImg.append('img', image);
+  if(file.value) {
+    const formData = new FormData();
+
+    formData.append('img', file.value);
 
     const options = {
       method: 'POST',
-      body: bodyImg,
-      params: { user_id: 2 },
-      baseURL: 'http://localhost:8888'
+      body: formData,
+      params: { user_id: 3 },
+      baseURL: useRuntimeConfig().baseUrl
     };
 
-    const { data } = await useAsyncData('generate', () => $fetch('/generate/product', options));
+    const { data } = await useAsyncData(
+      'generate',
+      () => $fetch('/generate/product', options)
+    );
 
-    productId.value = data._rawValue.product_id;
+    productId.value = data.value.product_id;
 
-    const productDialog = document.getElementById('productDialog');
-    productDialog.showModal();
+    document.getElementById('productDialog').showModal();
   } else {
     alert("Please set JPG!!");
   }
@@ -55,7 +63,8 @@ const generateProduct = async () => {
 </script>
 
 <template>
-  <div class="w-fit mx-auto">
+  <div class="w-fit mx-auto flex flex-col justify-center">
+
     <dialog id="productDialog" class="bg-gray-300 rounded">
       <div class="p-3">
         <a class="text-lg font-bold text-slate-800">Your Product ID:&nbsp;&nbsp;</a>
@@ -67,15 +76,16 @@ const generateProduct = async () => {
         </button>
       </menu>
     </dialog>
-    <h1 class="font-bold italic text-4xl text-gray-300 m-10 p-10">
+
+    <h1 class="font-bold italic text-center text-4xl text-gray-300 m-10 p-10">
       Welcome to Genicons!!
     </h1>
     <form class="flex justify-center items-center space-x-6 p-10">
       <div class="shrink-0">
-        <img class="h-24 w-24 object-cover rounded-full" src="https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1361&q=80" alt="Current profile photo" />
+        <!-- <img class="h-24 w-24 object-cover rounded-full" src="/favicon.jpg" alt="Current profile photo" /> -->
+        <img class="h-24 w-24 object-cover -scale-x-100 scale-y-100 rotate-12" src="/hand.svg" />
       </div>
       <label class="block">
-        <span class="sr-only">Choose profile photo</span>
         <input type="file" @change="uploadImage" class="block w-full text-sm text-slate-500
           file:mr-4 file:py-2 file:px-4
           file:rounded-full file:border-0
@@ -87,22 +97,32 @@ const generateProduct = async () => {
     </form>
     <div class="flex space-x-2 justify-center">
       <div>
-        <button type="button" @click="generateProduct" class="inline-block px-6 py-2 border-2 border-emerald-500 text-emerald-500 font-medium text-sm leading-tight uppercase rounded hover:bg-black hover:bg-opacity-5 focus:outline-none focus:ring-0 transition duration-150 ease-in-out">
+        <button @click="generateProduct" class="btn btn-outline btn-success">
           Let's create!!
         </button>
       </div>
     </div>
   </div>
-  <section class="overflow-hidden text-gray-700">
-    <div class="container px-5 py-2 mx-auto lg:pt-12 lg:px-32 border-t border-gray-400 my-10">
-      <div class="flex flex-wrap -m-1 md:-m-2">
-        <div v-for="url in urls" :key="url" class="flex flex-wrap w-1/3">
-          <div class="w-full p-1 md:p-2">
-            <img alt="gallery" class="block object-cover object-center w-full h-full rounded-lg"
-              :src="url">
+
+  <div class="border-t border-gray-400 m-10">
+    <div v-if="loading">
+      <section class="overflow-hidden text-gray-700">
+        <div class="container px-5 py-2 mx-auto lg:pt-12 lg:px-32 my-10">
+          <div class="flex flex-wrap -m-1 md:-m-2">
+            <div v-for="(product, index) in gallerys" :key="index" class="flex flex-wrap w-1/3">
+              <div class="w-full p-1 md:p-2">
+                <img alt="gallery" class="block object-cover object-center h-full w-full rounded-full"
+                  :src="product" />
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
     </div>
-  </section>
+    <div v-else>
+      <button class="flex btn loading btn-wide mx-auto btn-success text-xl m-10">
+        loading
+      </button>
+    </div>
+  </div>
 </template>

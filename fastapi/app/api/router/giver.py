@@ -23,6 +23,7 @@ async def fetch_product_ids(
     Return data in user table
 
     Args:
+
         user_id: query(int)
 
     Return:
@@ -77,14 +78,13 @@ async def fetch_gallery(
 
     Args:
 
-        num: query(int)
+        gallery_num: query(int)
 
     Return:
 
         products: zip-file
     """
     gallery_path = "./gallery.zip"
-
     res = await read_random_products(session, gallery_num, gallery_path)
 
     if not res:

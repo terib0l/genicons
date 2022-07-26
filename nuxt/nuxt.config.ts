@@ -30,8 +30,11 @@ export default defineNuxtConfig({
   ],
   modules: [
   ],
-  ssr: true,
+  ssr: false,
   typescript: {
     strict: true
+  },
+  publicRuntimeConfig: {
+    baseUrl: process.env.BASE_URL
   },
 })
