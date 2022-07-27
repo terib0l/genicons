@@ -37,6 +37,20 @@ async def create_user(session: AsyncSession, user: User) -> int:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+async def read_user(session: AsyncSession, user_id: int) -> list:
+    try:
+        async with session.begin():
+            statement = select(models.User).where(models.User.id == user_id)
+            user_obj = await session.execute(statement)
+            user = user_obj.scalars().first()
+
+        return [user.name, user.email]
+
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 async def read_all_users(session: AsyncSession) -> list:
     try:
         async with session.begin():

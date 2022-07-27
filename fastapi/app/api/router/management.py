@@ -1,4 +1,7 @@
 import logging
+import smtplib
+from email.mime.text import MIMEText
+from email.utils import formatdate
 from pydantic import UUID4, EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import (
@@ -10,8 +13,14 @@ from fastapi import (
 
 from app.db.session import get_db
 from app.api.crud.product import delete_product_by_product_id
-from app.api.crud.user import read_all_users, update_user_email, delete_user_by_id
+from app.api.crud.user import (
+    read_user,
+    read_all_users,
+    update_user_email,
+    delete_user_by_id,
+)
 from app.api.module.genicon_caller import caller
+from app.core.config import MANAGEMENT_EMAIL, MANAGEMENT_EMAIL_PASSWD
 
 logger = logging.getLogger("genicons").getChild("management")
 
@@ -118,5 +127,23 @@ async def delete_user(
 
 
 @router.post("/send/contact")
-def send_contact(contents: str = Form(...)):
-    pass
+async def send_contact(
+    user_id: int = Query(...),
+    contents: str = Form(...),
+    session: AsyncSession = Depends(get_db),
+):
+    user_name, user_email = await read_user(session=session, user_id=user_id)
+
+    msg = MIMEText(contents, "html")
+    msg["Subject"] = f"GENICONS CONTACTS from {user_name}"
+    msg["From"] = user_email
+    msg["To"] = MANAGEMENT_EMAIL
+    msg["Date"] = formatdate()
+
+    smtpobj = smtplib.SMTP("smtp.gmail.com", 587, timeout=15)
+    smtpobj.starttls()
+    smtpobj.login(MANAGEMENT_EMAIL, MANAGEMENT_EMAIL_PASSWD)
+    smtpobj.sendmail(MANAGEMENT_EMAIL, MANAGEMENT_EMAIL, msg.as_string())
+    smtpobj.quit()
+
+    return {"user_name": user_name, "user_email": user_email}

@@ -1,3 +1,4 @@
+from pydantic import EmailStr
 from starlette.config import Config
 from starlette.datastructures import Secret
 
@@ -11,3 +12,6 @@ MYSQL_HOST = config("MYSQL_HOST", cast=str, default="127.0.0.1")
 MYSQL_NAME = config("MYSQL_NAME", cast=str, default="sample_db")
 MYSQL_USER = config("MYSQL_USER", cast=str, default="user")
 MYSQL_PASSWORD = config("MYSQL_PASSWORD", cast=Secret, default="password")
+
+MANAGEMENT_EMAIL = config("MANAGEMENT_EMAIL", cast=EmailStr)
+MANAGEMENT_EMAIL_PASSWD = config("MANAGEMENT_EMAIL_PASSWD", cast=Secret)

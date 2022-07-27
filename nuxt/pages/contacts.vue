@@ -14,6 +14,9 @@ const sendText = async () => {
     if (res) {
       const options = {
         method: 'POST',
+        params: {
+          gallery_num: 1
+        },
         body: { contents: contents },
         baseURL: useRuntimeConfig().baseUrl
       }
