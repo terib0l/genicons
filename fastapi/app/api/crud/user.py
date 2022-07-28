@@ -1,7 +1,6 @@
 import logging
-
-from fastapi import HTTPException, status
-from typing import List
+import zipfile
+from typing import List, Union
 from pydantic import UUID4, EmailStr
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
@@ -13,7 +12,7 @@ from app.api.schema.user import User
 logger = logging.getLogger("genicons")
 
 
-async def create_user(session: AsyncSession, user: User) -> int:
+async def create_user(session: AsyncSession, user: User) -> Union[int, bool]:
     try:
         async with session.begin():
             session.add(models.User(name=user.name, email=user.email))
@@ -34,21 +33,21 @@ async def create_user(session: AsyncSession, user: User) -> int:
 
     except Exception as e:
         logger.error(e)
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return False
 
 
-async def read_user(session: AsyncSession, user_id: int) -> list:
+async def get_user(session: AsyncSession, username: str) -> Union[dict, bool]:
     try:
         async with session.begin():
-            statement = select(models.User).where(models.User.id == user_id)
+            statement = select(models.User).where(models.User.name == username)
             user_obj = await session.execute(statement)
             user = user_obj.scalars().first()
 
-        return [user.name, user.email]
+        return user
 
     except Exception as e:
         logger.error(e)
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return False
 
 
 async def read_all_users(session: AsyncSession) -> list:
@@ -62,7 +61,7 @@ async def read_all_users(session: AsyncSession) -> list:
 
     except Exception as e:
         logger.error(e)
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return False
 
 
 async def read_product_ids(session: AsyncSession, user_id: int) -> List[UUID4]:
@@ -87,9 +86,33 @@ async def read_product_ids(session: AsyncSession, user_id: int) -> List[UUID4]:
 
     except Exception as e:
         logger.error(e)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
+        return False
+
+
+async def read_product_origins(
+    session: AsyncSession, user_id: int, origins_path: str
+) -> bool:
+    try:
+        async with session.begin():
+            statement = (
+                select(models.User)
+                .where(models.User.id == user_id)
+                .options(selectinload(models.User.products))
+            )
+            user_obj = await session.execute(statement)
+            user = user_obj.scalars().first()
+
+        with zipfile.ZipFile(origins_path, "w") as zip_file:
+            [
+                zip_file.writestr(f"{product.product_id}.jpg", product.origin_img)
+                for product in user.products
+            ]
+
+        return True
+
+    except Exception as e:
+        logger.error(e)
+        return False
 
 
 async def update_user_email(
@@ -112,9 +135,7 @@ async def update_user_email(
 
     except Exception as e:
         logger.error(e)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
+        return False
 
 
 async def delete_user_by_id(session: AsyncSession, user_id: int) -> bool:
@@ -135,6 +156,4 @@ async def delete_user_by_id(session: AsyncSession, user_id: int) -> bool:
 
     except Exception as e:
         logger.error(e)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
+        return False

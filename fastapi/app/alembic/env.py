@@ -5,7 +5,7 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from app.core.config import DATABASE_URL
+from app.core.config import MYSQL_HOST, MYSQL_NAME, MYSQL_USER, MYSQL_PASSWORD
 from app.db.session import Base
 from app.db.models import User, Product
 
@@ -13,7 +13,10 @@ from app.db.models import User, Product
 # access to the values within the .ini file in use.
 config = context.config
 
-config.set_main_option("sqlalchemy.url", DATABASE_URL)
+config.set_main_option(
+    "sqlalchemy.url",
+    f"mysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}/{MYSQL_NAME}?charset=utf8mb4",  # noqa: E501
+)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

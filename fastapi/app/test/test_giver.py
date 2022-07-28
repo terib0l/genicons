@@ -7,6 +7,8 @@ from jsonschema import Draft7Validator
 
 from app.test.schema.schema_giver import (
     schema_fetch_product_ids,
+    schema_fetch_product_origins,
+    schema_fetch_product_origins_headers,
     schema_fetch_product,
     schema_fetch_product_headers,
     schema_fetch_gallery,
@@ -23,6 +25,23 @@ async def test_fetch_product_ids(async_client):
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
     assert Draft7Validator(schema_fetch_product_ids).is_valid(data)
+
+
+@pytest.mark.fetch_product_origins
+@pytest.mark.asyncio
+async def test_fetch_product_origins(async_client):
+    user_id = random.choice([1, 2, 3])
+    response = await async_client.get(f"fetch/product/origins?user_id={user_id}")
+
+    assert response.status_code == status.HTTP_200_OK
+
+    with ZipFile(io.BytesIO(response._content), "r") as zipfile:
+        name_list = zipfile.namelist()
+        assert Draft7Validator(schema_fetch_product_origins).is_valid(name_list)
+
+    assert Draft7Validator(schema_fetch_product_origins_headers).is_valid(
+        dict(response.headers)
+    )
 
 
 @pytest.mark.fetch_product

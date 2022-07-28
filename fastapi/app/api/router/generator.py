@@ -8,6 +8,8 @@ from fastapi import (
     UploadFile,
     Depends,
     Query,
+    HTTPException,
+    status,
 )
 
 from app.db.session import get_db
@@ -16,7 +18,7 @@ from app.api.schema.user import User
 from app.api.crud.product import create_product
 from app.api.crud.user import create_user
 from app.api.module.dependency import ValidateUploadFile, FileTypeName
-from app.api.module.genicon_caller import caller
+from app.api.module.send import caller
 
 logger = logging.getLogger("genicons").getChild("generator")
 
@@ -50,6 +52,9 @@ async def generate_user(
     """
     id = await create_user(session, User(name=name, email=email))
 
+    if not id:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
     logger.info("generate_user() created new user_id: %s", id)
     return {"user_id": id}
 
@@ -77,7 +82,7 @@ async def generate_product(
     product_id = uuid4()
 
     with img.file as data:
-        await create_product(
+        res = await create_product(
             session,
             Product(
                 product_id=product_id,
@@ -87,6 +92,9 @@ async def generate_product(
                 users_id=user_id,
             ),
         )
+
+        if not res:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     background.add_task(caller, session, product_id)
 

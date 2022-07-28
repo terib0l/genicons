@@ -8,7 +8,6 @@ from app.base import api_router
 from app.core.config import PROJECT_NAME, VERSION, DEBUG
 
 logger = logging.getLogger("genicons")
-logger.info("http://localhost:8888/docs")
 
 app = FastAPI(title=PROJECT_NAME, version=VERSION, debug=DEBUG)
 app.add_middleware(
@@ -24,6 +23,11 @@ app.include_router(api_router)
 
 @app.on_event("startup")
 def startup_event():
+    logger.info("http://localhost:8888/docs")
+
+
+@app.on_event("shutdown")
+def shutdown_event():
     pass
 
 
