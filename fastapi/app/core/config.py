@@ -28,7 +28,7 @@ SECRET_KEY = config(
         ["openssl", "rand", "-hex", "32"], stdout=subprocess.PIPE, text=True
     ).stdout[:-1],
 )
-ALGORITHM = config("ALGORITHM", cast=str, default="RS256")
+ALGORITHM = config("ALGORITHM", cast=str, default="HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = config(
     "ACCESS_TOKEN_EXPIRE_MINUTES", cast=int, default=30
 )

@@ -5,8 +5,10 @@ from fastapi import APIRouter, Depends, Query, BackgroundTasks, HTTPException, s
 from fastapi.responses import FileResponse
 
 from app.db.session import get_db
+from app.api.schema.user import User
 from app.api.crud.product import read_product, read_random_products
 from app.api.crud.user import read_product_ids, read_product_origins
+from app.api.module.auth import get_current_user
 from app.api.module.util import remove_file
 
 logger = logging.getLogger("genicons").getChild("giver")
@@ -16,44 +18,44 @@ router = APIRouter()
 
 @router.get("/fetch/product/ids")
 async def fetch_product_ids(
-    user_id: int = Query(...),
+    user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ):
     """
-    Return data in user table
+    Return Product IDs
 
     Args:
 
-        user_id: query(int)
+        token: Bearer(jwt)
 
     Return:
 
-        list: [{name, id, premium, email}, ...]
+        product_ids: [uuid4, ...]
     """
-    return await read_product_ids(session, user_id)
+    return await read_product_ids(session, user.id)
 
 
 @router.get("/fetch/product/origins")
 async def fetch_product_origins(
     background: BackgroundTasks,
-    user_id: int = Query(...),
+    user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ):
     """
-    Return data in user table
+    Return Origin-IMGs
 
     Args:
 
-        user_id: query(int)
+        token: Bearer(jwt)
 
     Return:
 
-        products: zip-file (contained origin_img)
+        origin_img: zip
     """
     origins_path = "./origins.zip"
     background.add_task(remove_file, path=origins_path)
 
-    res = await read_product_origins(session, user_id, origins_path)
+    res = await read_product_origins(session, user.id, origins_path)
 
     if not res:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -68,19 +70,21 @@ async def fetch_product_origins(
 @router.get("/fetch/product")
 async def fetch_product(
     background: BackgroundTasks,
+    user: User = Depends(get_current_user),
     product_id: UUID4 = Query(...),
     session: AsyncSession = Depends(get_db),
 ):
     """
-    Return generated icons
+    Return Icons
 
     Args:
 
-        product_id: UUID4
+        token: Bearer(jwt)
+        product_id: Query(uuid4)
 
     Return:
 
-        products: zip-file (contained two icons)
+        icons: zip
     """
     product_path = f"./{product_id}.zip"
     background.add_task(remove_file, path=product_path)
@@ -88,7 +92,7 @@ async def fetch_product(
     res = await read_product(session, product_id, product_path)
 
     if not res:
-        raise HTTPException(status_code=status.HTTP_425_TOO_EARLY)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     return FileResponse(
         product_path,
@@ -104,15 +108,15 @@ async def fetch_gallery(
     session: AsyncSession = Depends(get_db),
 ):
     """
-    Return products for gallery
+    Return Random Products For Gallery
 
     Args:
 
-        gallery_num: query(int)
+        gallery_num: Query(int)
 
     Return:
 
-        products: zip-file
+        gallery: zip
     """
     gallery_path = "./gallery.zip"
     background.add_task(remove_file, path=gallery_path)

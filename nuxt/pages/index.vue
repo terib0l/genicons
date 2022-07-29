@@ -12,7 +12,7 @@ const gallerys = ref<Array<string>>([]);
   const options = {
     method: 'GET',
     params: {
-      gallery_num: 6
+      gallery_num: 9
     },
     baseURL: useRuntimeConfig().baseUrl,
   };
@@ -21,8 +21,8 @@ const gallerys = ref<Array<string>>([]);
     'gallery',
     () => $fetch('/fetch/gallery', options)
   )
-  JSZip.loadAsync(data.value).then(function(zipData){
 
+  JSZip.loadAsync(data.value).then(function(zipData){
     Object.values(zipData.files).forEach(function (value) {
       gallerys.value.push(URL.createObjectURL(new Blob([value._data.compressedContent])));
     });
@@ -106,12 +106,12 @@ const generateProduct = async () => {
 
   <div class="border-t border-gray-400 m-10">
     <div v-if="loading">
-      <section class="overflow-hidden text-gray-700">
-        <div class="container px-5 py-2 mx-auto lg:pt-12 lg:px-32 my-10">
+      <section class="overflow-hidden text-gray-700 w-fit mx-auto justify-center">
+        <div class="container px-5 py-2 lg:pt-12 lg:px-32 my-10">
           <div class="flex flex-wrap -m-1 md:-m-2">
             <div v-for="(product, index) in gallerys" :key="index" class="flex flex-wrap w-1/3">
-              <div class="w-full p-1 md:p-2">
-                <img alt="gallery" class="block object-cover object-center h-full w-full rounded-full"
+              <div class="w-full p-1 md:p-2 flex justify-center">
+                <img alt="gallery" class="block object-cover object-center pointer-events-none touch-none select-none h-60 w-60 my-3 rounded-full"
                   :src="product" />
               </div>
             </div>

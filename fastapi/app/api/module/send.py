@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db import models
 
-logger = logging.getLogger("genicons").getChild("genicon_caller")
+logger = logging.getLogger("genicons").getChild("send")
 
 
 async def caller(

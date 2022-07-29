@@ -1,16 +1,13 @@
 schema_fetch_product_ids = {
     "type": "array",
-    "items": {
-        "type": "string",
-        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
-    },
+    "items": {"type": "string", "format": "uuid"},
 }
 
 schema_fetch_product_origins = {
     "type": "array",
     "items": {
         "type": "string",
-        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$\\.jpg$",
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.jpg$",
     },
 }
 

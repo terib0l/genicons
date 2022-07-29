@@ -12,17 +12,19 @@ from app.api.schema.user import User
 logger = logging.getLogger("genicons")
 
 
-async def create_user(session: AsyncSession, user: User) -> Union[int, bool]:
+async def create_user(
+    session: AsyncSession, username: str, password: str, email: EmailStr
+) -> Union[int, bool]:
     try:
         async with session.begin():
-            session.add(models.User(name=user.name, email=user.email))
+            session.add(models.User(name=username, password=password, email=email))
             await session.flush()
 
             statement = (
                 select(models.User)
                 .where(
-                    models.User.name == user.name,
-                    models.User.email == user.email,
+                    models.User.name == username,
+                    models.User.email == email,
                 )
                 .options(selectinload(models.User.products))
             )
@@ -36,7 +38,7 @@ async def create_user(session: AsyncSession, user: User) -> Union[int, bool]:
         return False
 
 
-async def get_user(session: AsyncSession, username: str) -> Union[dict, bool]:
+async def read_user(session: AsyncSession, username: str) -> Union[User, bool]:
     try:
         async with session.begin():
             statement = select(models.User).where(models.User.name == username)
@@ -50,7 +52,7 @@ async def get_user(session: AsyncSession, username: str) -> Union[dict, bool]:
         return False
 
 
-async def read_all_users(session: AsyncSession) -> list:
+async def read_all_users(session: AsyncSession) -> Union[list, bool]:
     try:
         async with session.begin():
             statement = select(models.User)
@@ -64,7 +66,9 @@ async def read_all_users(session: AsyncSession) -> list:
         return False
 
 
-async def read_product_ids(session: AsyncSession, user_id: int) -> List[UUID4]:
+async def read_product_ids(
+    session: AsyncSession, user_id: int
+) -> Union[List[UUID4], bool]:
     product_ids = list()
     try:
         async with session.begin():

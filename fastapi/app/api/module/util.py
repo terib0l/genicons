@@ -1,7 +1,7 @@
 import os
 import logging
 
-logger = logging.getLogger("genicons").getChild("utility")
+logger = logging.getLogger("genicons").getChild("util")
 
 
 def remove_file(path: str = None, paths: list = None):

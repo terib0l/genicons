@@ -5,7 +5,7 @@ from typing import List
 from fastapi import Request, File, Query, status, HTTPException
 from fastapi.datastructures import UploadFile
 
-logger = logging.getLogger("genicons")
+logger = logging.getLogger("genicons").getChild("dependency")
 
 
 class FileTypeName(str, Enum):

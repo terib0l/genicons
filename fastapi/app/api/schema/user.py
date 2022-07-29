@@ -6,8 +6,9 @@ from app.api.schema.product import Product
 
 
 class User(BaseModel):
-    id: Optional[int] = None
+    id: int
     name: str
+    password: str
     email: EmailStr
     premium: bool = False
 

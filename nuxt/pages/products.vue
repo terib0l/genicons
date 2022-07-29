@@ -1,6 +1,12 @@
 <script setup lang="ts">
+import JSZip from "jszip";
+
+export interface productData {
+  id: string;
+  img: string;
+}
+const productList = ref<Array<productData>>([]);
 const productIdsBool = ref<boolean>(false);
-const productIds = ref<Array<string>>([]);
 
 // Immediate Func
 (async () => {
@@ -18,12 +24,34 @@ const productIds = ref<Array<string>>([]);
   );
 
   for (let i = 0; i < data.value.length; i++){
-    productIds.value.push(data.value[i]);
+    productList.value.push({
+      id: data.value[i],
+      img: ""
+    });
   }
 
-  if ( productIds.value.length > 0 ){
+  if ( productList.value.length > 0 ){
     productIdsBool.value = true;
   }
+})();
+(async () => {
+  const options = {
+    method: 'GET',
+    params: {
+      user_id: 3
+    },
+    baseURL: useRuntimeConfig().baseUrl,
+  };
+
+  const { data, pending } = await useLazyAsyncData(
+    'productOrigins',
+    () => $fetch('/fetch/product/origins', options)
+  );
+  JSZip.loadAsync(data.value).then(function(zipData){
+    Object.values(zipData.files).forEach(function (value, index) {
+      productList.value[index].img = URL.createObjectURL(new Blob([value._data.compressedContent]));
+    });
+  });
 })();
 
 const fetchProduct = async (productId: string) => {
@@ -69,12 +97,16 @@ const fetchProduct = async (productId: string) => {
           <tr class="text-center">
             <th class="text-xl">Num</th>
             <th class="text-xl">Product ID</th>
+            <th class="text-xl">Origin Img</th>
           </tr>
         </thead>
-        <tbody v-for="(productId, index) in productIds" :key="index">
-          <tr class="hover text-center" @click="fetchProduct(productId)">
-            <th class="text-emerald-400">{{ index }}</th>
-            <td class="text-emerald-500 text-lg font-semibold font-mono">{{ productId }}</td>
+        <tbody>
+          <tr v-for="(productData, index) in productList" :key="index" class="hover text-center" @click="fetchProduct(productId)">
+            <td class="text-emerald-400">{{ index }}</td>
+            <td class="text-emerald-500 text-lg font-semibold font-mono">{{ productData.id }}</td>
+            <td class="flex justify-center">
+              <img class="h-10 w-10" :src="productData.img" />
+            </td>
           </tr>
         </tbody>
       </table>

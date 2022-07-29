@@ -1,21 +1,25 @@
 import pytest
-import random
 from fastapi import status
 from jsonschema import Draft7Validator
 
 from app.test.schema.schema_generator import (
     schema_generate_user,
     schema_generate_product,
+    schema_send_contact,
 )
 
 
 @pytest.mark.generate_user
 @pytest.mark.asyncio
 async def test_generate_user(async_client, random_user):
-    name = random_user["name"]
-    email = random_user["email"]
-
-    response = await async_client.post(url=f"generate/user?name={name}&email={email}")
+    response = await async_client.post(
+        url="generate/user",
+        data={
+            "name": random_user["name"],
+            "password": random_user["password"],
+            "email": random_user["email"],
+        },
+    )
 
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
@@ -24,13 +28,25 @@ async def test_generate_user(async_client, random_user):
 
 @pytest.mark.generate_product
 @pytest.mark.asyncio
-async def test_generate_product(async_client, random_image):
-    user_id = random.choice([1, 2, 3])
+async def test_generate_product(async_client, token_header, random_image):
     response = await async_client.post(
-        url=f"generate/product?user_id={user_id}",
-        files={"img": (random_image.name, open(random_image.path, "rb"), "image/jpeg")},
+        url="generate/product",
+        headers=token_header,
+        files={"img": (random_image.name, random_image.img, "image/jpeg")},
     )
 
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
     assert Draft7Validator(schema_generate_product).is_valid(data)
+
+
+@pytest.mark.send_contact
+@pytest.mark.asyncio
+async def test_send_contact(async_client, token_header, random_contents):
+    response = await async_client.post(
+        url="send/contact", headers=token_header, data={"contents": random_contents}
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    data = response.json()
+    assert Draft7Validator(schema_send_contact).is_valid(data)

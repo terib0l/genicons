@@ -13,10 +13,17 @@ schema_generate_product = {
     "type": "object",
     "required": ["product_id"],
     "additionalProperties": False,
+    "properties": {"product_id": {"type": "string", "format": "uuid"}},
+}
+
+schema_send_contact = {
+    "type": "object",
+    "required": ["username", "email"],
+    "additionalProperties": False,
     "properties": {
-        "product_id": {
+        "username": {
             "type": "string",
-            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
-        }
+        },
+        "email": {"type": "string", "format": "email"},
     },
 }

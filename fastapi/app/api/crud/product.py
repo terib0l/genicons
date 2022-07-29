@@ -49,15 +49,11 @@ async def read_product(
 ) -> bool:
     try:
         async with session.begin():
-            statement = select(
-                models.Product.rounded_square_icon,
-                models.Product.circle_icon,
-            ).where(models.Product.product_id == product_id)
+            statement = select(models.Product).where(
+                models.Product.product_id == product_id
+            )
             product_obj = await session.execute(statement)
             product = product_obj.scalars().first()
-
-        if not product.rounded_square_icon or not product.circle_icon:
-            return False
 
         with zipfile.ZipFile(product_path, "w") as zip_file:
             zip_file.writestr(

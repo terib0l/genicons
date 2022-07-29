@@ -1,6 +1,5 @@
 import io
 import pytest
-import random
 from fastapi import status
 from zipfile import ZipFile
 from jsonschema import Draft7Validator
@@ -18,9 +17,11 @@ from app.test.schema.schema_giver import (
 
 @pytest.mark.fetch_product_ids
 @pytest.mark.asyncio
-async def test_fetch_product_ids(async_client):
-    user_id = random.choice([1, 2, 3])
-    response = await async_client.get(url=f"fetch/product/ids?user_id={user_id}")
+async def test_fetch_product_ids(async_client, token_header):
+    response = await async_client.get(
+        url="fetch/product/ids",
+        headers=token_header,
+    )
 
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
@@ -29,9 +30,11 @@ async def test_fetch_product_ids(async_client):
 
 @pytest.mark.fetch_product_origins
 @pytest.mark.asyncio
-async def test_fetch_product_origins(async_client):
-    user_id = random.choice([1, 2, 3])
-    response = await async_client.get(f"fetch/product/origins?user_id={user_id}")
+async def test_fetch_product_origins(async_client, token_header):
+    response = await async_client.get(
+        "fetch/product/origins",
+        headers=token_header,
+    )
 
     assert response.status_code == status.HTTP_200_OK
 
@@ -46,8 +49,11 @@ async def test_fetch_product_origins(async_client):
 
 @pytest.mark.fetch_product
 @pytest.mark.asyncio
-async def test_fetch_product(async_client, product_id):
-    response = await async_client.get(f"fetch/product?product_id={product_id}")
+async def test_fetch_product(async_client, token_header, product_id):
+    response = await async_client.get(
+        f"fetch/product?product_id={product_id}",
+        headers=token_header,
+    )
 
     assert response.status_code == status.HTTP_200_OK
 

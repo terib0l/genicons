@@ -1,13 +1,16 @@
 import logging
+import smtplib
 from uuid import uuid4
 from pydantic import EmailStr
+from email.mime.text import MIMEText
+from email.utils import formatdate
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import (
     APIRouter,
     BackgroundTasks,
     UploadFile,
     Depends,
-    Query,
+    Form,
     HTTPException,
     status,
 )
@@ -19,6 +22,8 @@ from app.api.crud.product import create_product
 from app.api.crud.user import create_user
 from app.api.module.dependency import ValidateUploadFile, FileTypeName
 from app.api.module.send import caller
+from app.api.module.auth import get_password_hash, get_current_user
+from app.core.config import MANAGEMENT_EMAIL, MANAGEMENT_EMAIL_PASSWD
 
 logger = logging.getLogger("genicons").getChild("generator")
 
@@ -34,8 +39,9 @@ validate_upload_file = ValidateUploadFile(
 
 @router.post("/generate/user")
 async def generate_user(
-    name: str = Query(...),
-    email: EmailStr = Query(...),
+    name: str = Form(...),
+    password: str = Form(...),
+    email: EmailStr = Form(...),
     session: AsyncSession = Depends(get_db),
 ):
     """
@@ -43,14 +49,19 @@ async def generate_user(
 
     Args:
 
-        name: query(str)
-        email: query(EmailStr)
+        name: Form(str)
+        password: Form(str)
+        email: Form(email)
 
     Return:
 
         user_id: int
     """
-    id = await create_user(session, User(name=name, email=email))
+    name = "".join(name.lower().split())
+
+    id = await create_user(
+        session, username=name, password=get_password_hash(password), email=email
+    )
 
     if not id:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -62,7 +73,7 @@ async def generate_user(
 @router.post("/generate/product")
 async def generate_product(
     background: BackgroundTasks,
-    user_id: int = Query(...),
+    user: User = Depends(get_current_user),
     img: UploadFile = Depends(validate_upload_file),
     session: AsyncSession = Depends(get_db),
 ):
@@ -71,14 +82,13 @@ async def generate_product(
 
     Args:
 
-        user_id: query(int)
-        img: post-data(File)
+        token: Bearer(jwt)
+        img: Form(jpeg)
 
     Return:
 
         product_id: uuid4
     """
-    logger.info("generate_product be acessed!!")
     product_id = uuid4()
 
     with img.file as data:
@@ -89,7 +99,7 @@ async def generate_product(
                 origin_img=data.read(),
                 rounded_square_icon=None,
                 circle_icon=None,
-                users_id=user_id,
+                users_id=user.id,
             ),
         )
 
@@ -99,4 +109,38 @@ async def generate_product(
     background.add_task(caller, session, product_id)
 
     logger.info("generate_product() created new product: %s", product_id)
+
     return {"product_id": product_id}
+
+
+@router.post("/send/contact")
+async def send_contact(
+    user: User = Depends(get_current_user),
+    contents: str = Form(...),
+):
+    """
+    Send Contact Email
+
+    Args:
+
+        token: Bearer(jwt)
+        contents: Form(str)
+
+    Return:
+
+        username: str
+        email: email
+    """
+    msg = MIMEText(contents, "html")
+    msg["Subject"] = "GENICONS CONTACTS from {}".format(user.name)
+    msg["From"] = user.email
+    msg["To"] = MANAGEMENT_EMAIL
+    msg["Date"] = formatdate()
+
+    smtpobj = smtplib.SMTP("smtp.gmail.com", 587, timeout=15)
+    smtpobj.starttls()
+    smtpobj.login(MANAGEMENT_EMAIL, MANAGEMENT_EMAIL_PASSWD)
+    smtpobj.sendmail(MANAGEMENT_EMAIL, MANAGEMENT_EMAIL, msg.as_string())
+    smtpobj.quit()
+
+    return {"username": user.name, "email": user.email}
