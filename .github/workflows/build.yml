@@ -49,9 +49,10 @@ jobs:
 
       - name: Pytest
         run: |
+          env
           cd fastapi/
           poetry install --no-interaction
-          poetry run pytest -v
+          poetry run pytest -v -e 
         env:
           MANAGEMENT_EMAIL: ${{ secrets.MANAGEMENT_EMAIL }}
           MANAGEMENT_EMAIL_PASSWD: ${{ secrets.MANAGEMENT_EMAIL_PASSWD }}
