@@ -34,7 +34,6 @@ jobs:
           
     steps:
 
-      ## This DevSecOps pipeline exclude pre-commit hooking
       - name: Check out repository code
         uses: actions/checkout@v2
 
@@ -48,7 +47,6 @@ jobs:
         with:
           poetry-version: ${{ matrix.poetry-version }}
 
-      ## Unittest
       - name: Pytest
         run: |
           cd fastapi/

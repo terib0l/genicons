@@ -1,4 +1,4 @@
-FROM python:3.8
+FROM python:3.9
 
 WORKDIR /usr/src/app
 
@@ -14,4 +14,4 @@ COPY . /usr/src/app
 
 EXPOSE 8888
 
-CMD ["poetry", "run", "python", "index.py"]
+CMD ["poetry", "run", "python", "main.py"]

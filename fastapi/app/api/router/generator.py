@@ -49,7 +49,7 @@ async def generate_user(
 
     Args:
 
-        name: Form(str)
+        username: Form(str)
         password: Form(str)
         email: Form(email)
 
