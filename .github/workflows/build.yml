@@ -50,18 +50,18 @@ jobs:
       - name: Preparetion for Pytest
         run: |
           touch fastapi/pytest.ini
-          echo -e "[pytest]\nenv =\n" >> fastapi/pytest.ini
-          echo -e "    D:MANAGEMENT_EMAIL:$MANAGEMENT_EMAIL\n" >> fastapi/pytest.ini
-          echo -e "    D:MANAGEMENT_EMAIL_PASSWD:$MANAGEMENT_EMAIL_PASSWD" >> fastapi/pytest.ini
+          echo -e "[pytest]\nenv =" >> fastapi/pytest.ini
+          echo -e "\n    D:MANAGEMENT_EMAIL=$MANAGEMENT_EMAIL" >> fastapi/pytest.ini
+          echo -e "\n    D:MANAGEMENT_EMAIL_PASSWD=$MANAGEMENT_EMAIL_PASSWD" >> fastapi/pytest.ini
+        env:
+          MANAGEMENT_EMAIL: ${{ secrets.MANAGEMENT_EMAIL }}
+          MANAGEMENT_EMAIL_PASSWD: ${{ secrets.MANAGEMENT_EMAIL_PASSWD }}
 
       - name: Pytest
         run: |
           cd fastapi/
           poetry install --no-interaction
           poetry run pytest -v -c pytest.ini
-        env:
-          MANAGEMENT_EMAIL: ${{ secrets.MANAGEMENT_EMAIL }}
-          MANAGEMENT_EMAIL_PASSWD: ${{ secrets.MANAGEMENT_EMAIL_PASSWD }}
 
   sast:
     needs: build
