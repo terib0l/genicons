@@ -14,12 +14,8 @@ MYSQL_NAME = config("MYSQL_NAME", cast=str, default="sample_db")
 MYSQL_USER = config("MYSQL_USER", cast=str, default="user")
 MYSQL_PASSWORD = config("MYSQL_PASSWORD", cast=Secret, default="password")
 
-MANAGEMENT_EMAIL = config(
-    "MANAGEMENT_EMAIL", cast=EmailStr, default="developer's gmail"
-)
-MANAGEMENT_EMAIL_PASSWD = config(
-    "MANAGEMENT_EMAIL_PASSWD", cast=Secret, default="<gmail App passwords>"
-)
+MANAGEMENT_EMAIL = config("MANAGEMENT_EMAIL", cast=EmailStr)
+MANAGEMENT_EMAIL_PASSWD = config("MANAGEMENT_EMAIL_PASSWD", cast=Secret)
 
 SECRET_KEY = config(
     "SECRET_KEY",

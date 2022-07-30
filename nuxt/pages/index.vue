@@ -1,65 +1,12 @@
 <script setup lang="ts">
-import JSZip from "jszip";
+definePageMeta({
+  middleware: 'auth'
+});
 
-const loading = ref<boolean>(false);
+const { loading, gallerys, productId,
+        fetchGallery, uploadImage, generateProduct } = useIndex();
 
-const file = ref<Blob>();
-const productId = ref<string>('');
-
-const gallerys = ref<Array<string>>([]);
-
-(async () => {
-  const options = {
-    method: 'GET',
-    params: {
-      gallery_num: 9
-    },
-    baseURL: useRuntimeConfig().baseUrl,
-  };
-
-  const { data, pending } = await useLazyAsyncData(
-    'gallery',
-    () => $fetch('/fetch/gallery', options)
-  )
-
-  JSZip.loadAsync(data.value).then(function(zipData){
-    Object.values(zipData.files).forEach(function (value) {
-      gallerys.value.push(URL.createObjectURL(new Blob([value._data.compressedContent])));
-    });
-
-    loading.value = true;
-  });
-})();
-
-const uploadImage = ( event: any ) => {
-  file.value = event.target.files[0];
-}
-
-const generateProduct = async () => {
-  if(file.value) {
-    const formData = new FormData();
-
-    formData.append('img', file.value);
-
-    const options = {
-      method: 'POST',
-      body: formData,
-      params: { user_id: 3 },
-      baseURL: useRuntimeConfig().baseUrl
-    };
-
-    const { data } = await useAsyncData(
-      'generate',
-      () => $fetch('/generate/product', options)
-    );
-
-    productId.value = data.value.product_id;
-
-    document.getElementById('productDialog').showModal();
-  } else {
-    alert("Please set JPG!!");
-  }
-}
+fetchGallery();
 </script>
 
 <template>
@@ -67,7 +14,7 @@ const generateProduct = async () => {
 
     <dialog id="productDialog" class="bg-gray-300 rounded">
       <div class="p-3">
-        <a class="text-lg font-bold text-slate-800">Your Product ID:&nbsp;&nbsp;</a>
+        <a class="text-lg font-bold text-slate-800">Product ID:&nbsp;&nbsp;</a>
         <a class="text-xl font-bold text-violet-700">{{ productId }}</a>
       </div>
       <menu class="flex justify-center">

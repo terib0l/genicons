@@ -1,7 +1,7 @@
 import logging
 from typing import Union
-from jose import JWTError, jwt
-from datetime import datetime, timedelta
+from jose import jwt, JWTError, ExpiredSignatureError
+from datetime import datetime, timedelta, timezone
 from passlib.context import CryptContext
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Depends, HTTPException, status
@@ -46,9 +46,9 @@ async def authenticate_user(session: AsyncSession, username: str, password: str)
 def create_access_token(data: dict, expires_data: Union[timedelta, None] = None):
     to_encode = data.copy()
     if expires_data:
-        expire = datetime.utcnow() + expires_data
+        expire = datetime.now(timezone.utc) + expires_data
     else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
+        expire = datetime.now(timezone.utc) + timedelta(minutes=15)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, str(SECRET_KEY), algorithm=ALGORITHM)
     return encoded_jwt
@@ -62,8 +62,11 @@ async def get_current_user(
         username = payload.get("sub")
         if username is None:
             raise credentials_exception
-    except JWTError as e:
-        logger.error(e)
+    except ExpiredSignatureError:
+        logger.error("This token is expired")
+        raise credentials_exception
+    except JWTError:
+        logger.error("This token is invalid in any way")
         raise credentials_exception
     user = await read_user(session, username)
     if user is None:

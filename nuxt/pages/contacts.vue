@@ -1,38 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+definePageMeta({
+  middleware: 'auth'
+});
 
-// data
-const contents = ref('');
-
-// methods
-const sendText = async () => {
-  if (contents) {
-    const res: boolean = window.confirm(
-      `${contents.value}\n\nこの内容で送信しますか？`
-    );
-
-    if (res) {
-      const options = {
-        method: 'POST',
-        params: {
-          gallery_num: 1
-        },
-        body: { contents: contents },
-        baseURL: useRuntimeConfig().baseUrl
-      }
-
-      const { data } = await useAsyncData(
-        'contact',
-        () => $fetch('/send/contact', options)
-      );
-
-      alert(data.value);
-    }
-  } else {
-    alert("Please type your consern!!");
-  }
-};
-
+const { sent_message, sendMessage } = useContacts();
 </script>
 
 <template>
@@ -41,10 +12,10 @@ const sendText = async () => {
       Contact Form
     </h1>
     <div class="py-2 px-4 rounded-t-lg">
-      <textarea class="textarea textarea-success" v-model="contents" rows="7" cols="70" placeholder="Type requirements ..."></textarea>
+      <textarea class="textarea textarea-success" v-model="sent_message" rows="7" cols="70" placeholder="Type requirements ..."></textarea>
     </div>
     <div class="text-right py-2 px-3 border-t dark:border-gray-600">
-      <button @click="sendText" class="btn btn-success inline-flex items-center py-2.5 px-4 text-sm font-medium">
+      <button @click="sendMessage" class="btn btn-success inline-flex items-center py-2.5 px-4 text-sm font-medium">
         Send
       </button>
     </div>

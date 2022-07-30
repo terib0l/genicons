@@ -1,89 +1,13 @@
 <script setup lang="ts">
-import JSZip from "jszip";
+definePageMeta({
+  middleware: 'auth'
+});
 
-export interface productData {
-  id: string;
-  img: string;
-}
-const productList = ref<Array<productData>>([]);
-const productIdsBool = ref<boolean>(false);
+const { productList, productIdsFlag,
+        fetchProductIds, fetchProductOrigins, fetchProduct } = useProducts();
 
-// Immediate Func
-(async () => {
-  const options = {
-    method: 'GET',
-    params: {
-      user_id: 3
-    },
-    baseURL: useRuntimeConfig().baseUrl,
-  };
-
-  const { data } = await useAsyncData(
-    'productIds',
-    () => $fetch('/fetch/product/ids', options)
-  );
-
-  for (let i = 0; i < data.value.length; i++){
-    productList.value.push({
-      id: data.value[i],
-      img: ""
-    });
-  }
-
-  if ( productList.value.length > 0 ){
-    productIdsBool.value = true;
-  }
-})();
-(async () => {
-  const options = {
-    method: 'GET',
-    params: {
-      user_id: 3
-    },
-    baseURL: useRuntimeConfig().baseUrl,
-  };
-
-  const { data, pending } = await useLazyAsyncData(
-    'productOrigins',
-    () => $fetch('/fetch/product/origins', options)
-  );
-  JSZip.loadAsync(data.value).then(function(zipData){
-    Object.values(zipData.files).forEach(function (value, index) {
-      productList.value[index].img = URL.createObjectURL(new Blob([value._data.compressedContent]));
-    });
-  });
-})();
-
-const fetchProduct = async (productId: string) => {
-  const res: boolean = window.confirm(
-    `Will you download this product??\n\n${productId}`
-  );
-
-  if (res) {
-    const options = {
-      method: 'GET',
-      params: {
-        product_id: productId
-      },
-      baseURL: useRuntimeConfig().baseUrl,
-    };
-
-    const { data } = await useAsyncData(
-      'product',
-      () => $fetch('/fetch/product', options)
-    );
-
-    if (data.value && data.value instanceof Blob){
-      const uri = URL.createObjectURL(data.value);
-      const link = document.createElement('a');
-      link.download = `${productId}.zip`;
-      link.href = uri;
-      link.click();
-    } else {
-      alert(`This product is not created yet, so wait some minutes!!\n\n${productId}`)
-    }
-  }
-}
+fetchProductIds();
+fetchProductOrigins();
 </script>
 
 <template>
@@ -91,7 +15,7 @@ const fetchProduct = async (productId: string) => {
     <h1 class="font-bold italic text-center text-4xl text-gray-300 m-10 p-10">
       Your Products
     </h1>
-    <div v-if="productIdsBool">
+    <div v-if="productIdsFlag">
       <table class="table w-full">
         <thead>
           <tr class="text-center">
@@ -101,8 +25,8 @@ const fetchProduct = async (productId: string) => {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(productData, index) in productList" :key="index" class="hover text-center" @click="fetchProduct(productId)">
-            <td class="text-emerald-400">{{ index }}</td>
+          <tr v-for="(productData, index) in productList" :key="index" class="hover text-center" @click="fetchProduct(productData.id)">
+            <td class="text-emerald-400">{{ index+1 }}</td>
             <td class="text-emerald-500 text-lg font-semibold font-mono">{{ productData.id }}</td>
             <td class="flex justify-center">
               <img class="h-10 w-10" :src="productData.img" />
