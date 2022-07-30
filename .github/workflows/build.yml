@@ -47,12 +47,18 @@ jobs:
         with:
           poetry-version: ${{ matrix.poetry-version }}
 
+      - name: Preparetion for Pytest
+        run: |
+          touch fastapi/pytest.ini
+          echo -e "[pytest]\nenv =\n" >> fastapi/pytest.ini
+          echo -e "    D:MANAGEMENT_EMAIL:$MANAGEMENT_EMAIL\n" >> fastapi/pytest.ini
+          echo -e "    D:MANAGEMENT_EMAIL_PASSWD:$MANAGEMENT_EMAIL_PASSWD" >> fastapi/pytest.ini
+
       - name: Pytest
         run: |
-          env
           cd fastapi/
           poetry install --no-interaction
-          poetry run pytest -v -e 
+          poetry run pytest -v -c pytest.ini
         env:
           MANAGEMENT_EMAIL: ${{ secrets.MANAGEMENT_EMAIL }}
           MANAGEMENT_EMAIL_PASSWD: ${{ secrets.MANAGEMENT_EMAIL_PASSWD }}
