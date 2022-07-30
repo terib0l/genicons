@@ -15,9 +15,9 @@ async def test_generate_user(async_client, random_user):
     response = await async_client.post(
         url="generate/user",
         data={
-            "name": random_user["name"],
-            "password": random_user["password"],
+            "username": random_user["name"],
             "email": random_user["email"],
+            "password": random_user["password"],
         },
     )
 
