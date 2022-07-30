@@ -131,6 +131,7 @@ async def send_contact(
         username: str
         email: email
     """
+<<<<<<< HEAD
     logger.info("Email Sending ...")
 
     try:
@@ -147,6 +148,19 @@ async def send_contact(
         smtpobj.quit()
     except:
         logger.error("SMTP Error")
+=======
+    msg = MIMEText(contents, "html")
+    msg["Subject"] = "GENICONS CONTACTS from {}".format(user.name)
+    msg["From"] = user.email
+    msg["To"] = MANAGEMENT_EMAIL
+    msg["Date"] = formatdate()
+
+    smtpobj = smtplib.SMTP("smtp.gmail.com", 587, timeout=15)
+    smtpobj.starttls()
+    smtpobj.login(MANAGEMENT_EMAIL, str(MANAGEMENT_EMAIL_PASSWD))
+    smtpobj.sendmail(MANAGEMENT_EMAIL, MANAGEMENT_EMAIL, msg.as_string())
+    smtpobj.quit()
+>>>>>>> b351f63c4eefbdbc3b46ebd5f48991e026a80ea8
 
     return {"username": user.name, "email": user.email}
 
