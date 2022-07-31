@@ -139,7 +139,7 @@ async def send_contact(
 
     smtpobj = smtplib.SMTP("smtp.gmail.com", 587, timeout=15)
     smtpobj.starttls()
-    smtpobj.login(MANAGEMENT_EMAIL, str(MANAGEMENT_EMAIL_PASSWD))
+    smtpobj.login(MANAGEMENT_EMAIL, MANAGEMENT_EMAIL_PASSWD)
     smtpobj.sendmail(MANAGEMENT_EMAIL, MANAGEMENT_EMAIL, msg.as_string())
     smtpobj.quit()
 
