@@ -124,6 +124,9 @@ async def update_user_email(
 ) -> bool:
     try:
         async with session.begin():
+            # from sqlalchemy import update
+            # statement = update(models.User).where(models.User.id == user_id).values(email=new_email)
+            # await session.execute(statement)
             statement = select(models.User).where(
                 models.User.id == user_id,
             )
@@ -145,6 +148,9 @@ async def update_user_email(
 async def delete_user_by_id(session: AsyncSession, user_id: int) -> bool:
     try:
         async with session.begin():
+            # from sqlalchemy import delete
+            # statement = delete(models.User).where(models.User.id == user_id)
+            # await session.execute(statement)
             statement = (
                 select(models.User)
                 .where(models.User.id == user_id)

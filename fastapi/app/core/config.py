@@ -28,3 +28,5 @@ ALGORITHM = config("ALGORITHM", cast=str, default="HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = config(
     "ACCESS_TOKEN_EXPIRE_MINUTES", cast=int, default=30
 )
+
+ML_CALLER_URL = config("ML_CALLER_URL", cast=str, default="http://localhost:8080/generate/icon")

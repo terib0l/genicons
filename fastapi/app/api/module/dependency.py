@@ -29,8 +29,8 @@ class ValidateUploadFile:
         self.max_size = max_size
         self.file_type = file_type
 
-    async def __call__(self, request: Request, img: UploadFile = File(...)):
-        logger.info("validate UploadFile")
+    async def __call__(self, request: Request, image: UploadFile = File(...)):
+        logger.debug("validate UploadFile")
         # Check content-type
         form = await request.form()
         content_type = form[next(iter(form))].content_type
@@ -58,4 +58,4 @@ class ValidateUploadFile:
                 detail="Request Entity Too Large",
             )
 
-        return img
+        return image

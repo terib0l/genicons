@@ -74,7 +74,7 @@ async def generate_user(
 async def generate_product(
     background: BackgroundTasks,
     user: User = Depends(get_current_user),
-    img: UploadFile = Depends(validate_upload_file),
+    image: UploadFile = Depends(validate_upload_file),
     session: AsyncSession = Depends(get_db),
 ):
     """
@@ -83,7 +83,7 @@ async def generate_product(
     Args:
 
         token: Bearer(jwt)
-        img: Form(jpeg)
+        image: Form(jpeg)
 
     Return:
 
@@ -91,12 +91,13 @@ async def generate_product(
     """
     product_id = uuid4()
 
-    with img.file as data:
+    with image.file as img:
+        image_bytes = img.read()
         res = await create_product(
             session,
             Product(
                 product_id=product_id,
-                origin_img=data.read(),
+                origin_img=image_bytes,
                 rounded_square_icon=None,
                 circle_icon=None,
                 users_id=user.id,
@@ -106,9 +107,9 @@ async def generate_product(
         if not res:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    background.add_task(caller, session, product_id)
+        background.add_task(caller, image_bytes, product_id)
 
-    logger.info("generate_product() created new product: %s", product_id)
+    logger.debug("generate_product() created new product: %s", product_id)
 
     return {"product_id": product_id}
 

@@ -36,7 +36,6 @@ async def create_product(
 
             user.products.append(product_db)
 
-        logger.info("New Product: %s", product_db.product_id)
         return True
 
     except Exception as e:

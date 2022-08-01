@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "magenta"
+version = "0.1.0"
+description = ""
+authors = ["terib0l <taiyakiou@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.11"
+tensorflow = "^2.9.1"
+tensorflow-hub = "^0.12.0"
+matplotlib = "^3.5.2"
+fastapi = "^0.79.0"
+uvicorn = "^0.18.2"
+SQLAlchemy = "^1.4.39"
+mysqlclient = "^2.1.1"
+python-multipart = "^0.0.5"
+SQLAlchemy-Utils = "^0.38.3"
+
+[tool.poetry.dev-dependencies]
+pynvim = "^0.4.3"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

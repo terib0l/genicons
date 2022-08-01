@@ -32,7 +32,7 @@ async def test_generate_product(async_client, token_header, random_image):
     response = await async_client.post(
         url="generate/product",
         headers=token_header,
-        files={"img": (random_image.name, random_image.img, "image/jpeg")},
+        files={"image": (random_image.name, random_image.img, "image/jpeg")},
     )
 
     assert response.status_code == status.HTTP_200_OK

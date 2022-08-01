@@ -29,7 +29,7 @@ const register = (
     return;
   }
 
-  const usernameReg = /^[a-z]+$/;
+  const usernameReg = /^[a-z0-9]+$/;
   if (!usernameReg.test(username.value)){
     alert("This username is invalid!\n\n Username's regex is that /^[a-z]+$/");
     return;

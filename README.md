@@ -33,4 +33,5 @@ My aim of developing this application is to learn about these technologies.
 
 ## Thanks to
 
-[ICOON MONO](https://icooon-mono.com/)
+* [ICOON MONO](https://icooon-mono.com/)
+* [TensorFlow Hub](https://www.tensorflow.org/hub/tutorials/tf2_arbitrary_image_stylization) / ~~[FastStyle](https://github.com/cryu854/FastStyle)~~

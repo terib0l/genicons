@@ -1,39 +1,31 @@
 import logging
-
+import requests
 from pydantic import UUID4
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db import models
+from app.core.config import ML_CALLER_URL
 
 logger = logging.getLogger("genicons").getChild("send")
 
 
 async def caller(
-    session: AsyncSession,
+    image_bytes: bytes,
     product_id: UUID4,
 ):
-    logger.debug("genicon_caller(): start")
-
     try:
-        # Request to model of StyleTransfer for make Products
-        async with session.begin():
-            statement = select(models.Product).where(
-                models.Product.product_id == product_id
-            )
-            product_obj = await session.execute(statement)
-            product = product_obj.scalars().first()
+        logger.debug("genicon_caller(): start")
 
-            product.rounded_square_icon = product.origin_img
-            product.circle_icon = product.origin_img
-            session.add(product)
-            await session.flush()
-        """
-        response = requests.get(f'http://{uid}')
-        data = response.json()
-        product.create(session, uid, data["rs"], data["c"])
-        """
+        datas = {'product_id': product_id}
+        files = {'image': (f'{product_id}.jpg', image_bytes, 'image/jpeg')}
 
-        logger.debug("genicon_caller(): done")
+        response = requests.post(
+            ML_CALLER_URL,
+            data=datas,
+            files=files,
+        )
+
+        logger.info(f"ml_caller() {response.status_code}: {response.content}")
+
     except Exception as e:
-        logger.error("genicon_caller(): error => %s", e)
+        logger.error(e)
+    finally:
+        logger.debug("genicon_caller(): done")

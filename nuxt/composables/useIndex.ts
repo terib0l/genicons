@@ -37,7 +37,7 @@ const generateProduct = (file: Ref<Blob|null>, productId: Ref<string>) => async 
 
   if(file.value) {
     const formData = new FormData();
-    formData.append('img', file.value);
+    formData.append('image', file.value);
 
     const options = {
       method: 'POST',
